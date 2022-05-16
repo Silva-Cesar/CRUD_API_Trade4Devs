@@ -1,2 +1,2 @@
 # CRUD-Nodejs
-CRUD utilizando Node.js e Express.js.
+CRUD de API utilizando Node.js e Express.js.
