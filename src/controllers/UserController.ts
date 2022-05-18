@@ -22,7 +22,7 @@ class UserController extends Controller {
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const users = await User.create(req.body);
+    const users = await User.insertMany(req.body);
 
     return res.send(users)
   }
