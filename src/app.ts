@@ -22,7 +22,7 @@ class App {
   }
 
   private connectDataBase(): void {
-    mongoose.connect('mongodb+srv://jefferson_aula:aula1357Mongo@cluster0.abuxl.mongodb.net/crud-nodejs?retryWrites=true&w=majority')
+    mongoose.connect(`mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASS}@${process.env.MONGO_DB_CLUSTER}/crud-nodejs?retryWrites=true&w=majority`)
   }
 
   private initExpressJson(): void {
