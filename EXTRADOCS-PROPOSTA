@@ -29,6 +29,8 @@ Casos de Uso:
   - Telefone;
   - Nascimento;
   - Cpf
+  - "Usuário = e-mail?" 
+  - "Senha?"
 
     -> Retorno
       - Resultado (erro ou ok);
@@ -45,6 +47,7 @@ Casos de Uso:
 -> Operação
   - Tipo (entrada ou saída)
   - Valor
+  - "CPF?"
 
     -> Retorno
       - Resultado (erro ou ok);
@@ -55,3 +58,32 @@ Casos de Uso:
     -> Retorno
       - Valor;
 ------
+
+{
+  usuario: tal
+  senha: tal
+  cpf: 12345
+  Operação: "Entrada",
+  valor: 50.00
+  data: 16/05/2022 20:15:56
+}
+{  
+  cpf: 12345
+  Operação2: "Entrada",
+  valor: 50.00
+  data: 16/05/2022 20:15:56
+} 
+{
+  cpf: 12345
+  Operação3: "Entrada",
+  valor: 50.00
+  data: 16/05/2022 20:15:56
+}
+
+" É necessário usar a API login() como pré requisito para chamar cada uma das outras APIs ? " 
+
+"Usuário pode ser e-mail ou CPF?"
+
+"Pedir definição de usuário e senha na criação da conta?"
+
+"Utilizar CPF na operação?"
