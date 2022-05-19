@@ -31,13 +31,13 @@ class UserController extends Controller {
     const { id } = req.params;
 
     if (!Types.ObjectId.isValid(id)) {
-      return res.status(400).send('Id Inválido');
+      return res.status(400).send('Invalid Id');
     }
 
     const users = await User.findById(id);
 
     if(!users) {
-      return res.status(400).send('Usuário não encontrado');
+      return res.status(400).send('Invalid username');
     }
 
     return res.send(users);
