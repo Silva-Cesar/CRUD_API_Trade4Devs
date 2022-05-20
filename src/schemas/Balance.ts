@@ -12,7 +12,7 @@ const BalanceSchema = new Schema({
     required: [true, 'ID number is required']
   },
   saldo: {
-    type: parseFloat(Number.prototype.toFixed(2))
+    type: Number
   },
 })
 
