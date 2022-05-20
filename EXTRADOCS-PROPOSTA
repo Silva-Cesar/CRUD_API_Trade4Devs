@@ -45,9 +45,10 @@ Casos de Uso:
       - Operação
 ------
 -> Operação
-  - Tipo (entrada ou saída)
-  - Valor
-  - "CPF?"
+  - Tipo (entrada ou saída) (obrigatório) ??????
+  - Remetente (id) (obrigatório)
+  - Destinatario (id) (obrigatório)
+  - Valor (obrigatório)
 
     -> Retorno
       - Resultado (erro ou ok);
