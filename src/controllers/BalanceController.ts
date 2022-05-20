@@ -15,6 +15,7 @@ class BalanceController extends Controller {
     this.router.post(this.path, this.create);
     this.router.get(this.path, this.findById);
     this.router.put(this.path, this.edit);
+    this.router.delete(`${this.path}/:id`, this.delete);
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
@@ -51,6 +52,13 @@ class BalanceController extends Controller {
     const { id } = req.params;
     await Balance.findByIdAndUpdate(id, req.body);
     const balance = await Balance.findById(id);
+    return res.send(balance);
+  }
+
+  private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const { id } = req.params;
+    const balance = await Balance.findById(id);
+    balance.deleteOne();
     return res.send(balance);
   }
 
