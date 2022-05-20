@@ -16,4 +16,4 @@ const BalanceSchema = new Schema({
   },
 })
 
-export default model<BalanceInterface>('User', BalanceSchema);
+export default model<BalanceInterface>('Balance', BalanceSchema);
