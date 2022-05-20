@@ -1,29 +1,41 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface UserInterface extends Document {
-  name: string;
+  nome: string;
+  dtNasc: string;
+  cpf: number;
   email: string;
-  age: number;
-  phone: number;
+  telefone: string;
+  senha: string;
   creation: Date;
 }
 
 const UserSchema = new Schema({
-  name: {
+  nome: {
     type: String,
     required: [true, 'Name is required']
+  },
+  dtNasc: {
+    type: String,
+    required: [true, 'Birth date is required']
+  },
+  cpf: {
+    type: Number,
+    unique: true,
+    required: [true, 'ID number is required']
   },
   email: {
     type: String,
     unique: true,
     required: [true, 'E-mail is required']
   },
-  age: {
-    type: Number,
-    required: [true, 'Age is required']
+  telefone: {
+    type: String,
+    unique: true
   },
-  phone: {
-    type: Number
+  senha: {
+    type: String,
+    required: [true, 'Password is required']
   },
   creation: {
     type: Date,

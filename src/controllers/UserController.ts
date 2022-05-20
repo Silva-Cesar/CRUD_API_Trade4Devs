@@ -22,7 +22,7 @@ class UserController extends Controller {
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const users = await User.create(req.body);
+    const users = await User.insertMany(req.body);
 
     return res.send(users)
   }
@@ -31,13 +31,13 @@ class UserController extends Controller {
     const { id } = req.params;
 
     if (!Types.ObjectId.isValid(id)) {
-      return res.status(400).send('Id Inválido');
+      return res.status(400).send('Invalid Id');
     }
 
     const users = await User.findById(id);
 
     if(!users) {
-      return res.status(400).send('Usuário não encontrado');
+      return res.status(400).send('Invalid username');
     }
 
     return res.send(users);
