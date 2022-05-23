@@ -17,14 +17,14 @@ class UserController extends Controller {
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const users = await User.find();
+    const users = await User.find().select({ password: 0, __v: 0 });
     return res.send(users);
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const users = await User.insertMany(req.body);
 
-    return res.send(users)
+    return res.send(users);
   }
 
   private async findById(req: Request, res: Response, next: NextFunction): Promise<Response> {
@@ -34,9 +34,9 @@ class UserController extends Controller {
       return res.status(400).send('Invalid Id');
     }
 
-    const users = await User.findById(id);
+    const users = await User.findById(id).select({ password: 0, __v: 0 });
 
-    if(!users) {
+    if (!users) {
       return res.status(400).send('Invalid username');
     }
 
@@ -46,7 +46,7 @@ class UserController extends Controller {
   private async edit(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { id } = req.params;
     await User.findByIdAndUpdate(id, req.body);
-    const users = await User.findById(id);
+    const users = await User.findById(id).select({ password: 0, __v: 0 });
     return res.send(users);
   }
 

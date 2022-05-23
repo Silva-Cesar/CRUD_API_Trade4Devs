@@ -16,16 +16,16 @@ class RegisterController extends Controller {
   }
 
   private async getAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const register = await Register.find();
+    const register = await Register.find().select({ email: 0, password: 0, __v: 0 });
     return res.send(register);
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const register = await Register.create(req.body);
 
-    const balance = await Balance.create({...req.body, saldo: 0});
+    const balance = await Balance.create({ ...req.body, saldo: 0 });
 
-    return res.send(register)
+    return res.send(register);
   }
 
   private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
