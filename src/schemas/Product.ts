@@ -5,7 +5,7 @@ export interface ProductInterface extends Document {
   description: string;
   quantity: number;
   price: number;
-  creation: Date;
+  creat_At: Date;
 }
 
 const ProductSchema = new Schema({
@@ -25,7 +25,7 @@ const ProductSchema = new Schema({
     type: Number,
     required: [true, 'Price is required']
   },
-  creation: {
+  creat_At: {
     type: Date,
     default: Date.now
   }

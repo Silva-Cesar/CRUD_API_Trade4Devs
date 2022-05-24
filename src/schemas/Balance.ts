@@ -13,7 +13,7 @@ const BalanceSchema = new Schema({
   },
   saldo: {
     type: Number
-  },
+  }
 })
 
 export default model<BalanceInterface>('Balance', BalanceSchema);

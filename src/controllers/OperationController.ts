@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import Operation from '../schemas/Operation';
 import Controller from './Controller';
 import Product from '../schemas/Product';
-// import { Types } from 'mongoose';
 
 
 class OperationController extends Controller {

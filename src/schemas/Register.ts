@@ -7,7 +7,7 @@ export interface RegisterInterface extends Document {
   birth_date: Date;
   cpf: number;
   password: string;
-  creation: Date;
+  creat_At: Date;
 }
 
 const RegisterSchema = new Schema({
@@ -27,7 +27,6 @@ const RegisterSchema = new Schema({
   },
   birth_date: {
     type: Date,
-    default: Date.toString,
     required: [true, 'Birth date is required']
   },
   cpf: {
@@ -39,7 +38,7 @@ const RegisterSchema = new Schema({
     type: String,
     required: [true, 'Name is required']
   },
-  creation: {
+  creat_At: {
     type: Date,
     default: Date.now
   }
