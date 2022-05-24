@@ -1,26 +1,26 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface OperationInterface extends Document {
-  cpf: number;
-  tipo: string;
+  remetente: number;
+  destinatario: number;
   value: number;
-  creation: Date;
+  creat_At: Date;
 }
 
 const OperationSchema = new Schema({
-  cpf: {
+  remetente: {
     type: Number,
-    required: [true, 'CPF is required']
+    required: [true, 'Remetente is required']
   },
-  tipo: {
-    type: String,
-    required: [true, 'Type is required']
+  destinatario: {
+    type: Number,
+    required: [true, 'Destinatário is required']
   },
   value: {
     type: Number,
     required: [true, 'Value is required']
   },
-  creation: {
+  creat_At: {
     type: Date,
     default: Date.now
   }

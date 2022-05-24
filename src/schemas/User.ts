@@ -7,7 +7,7 @@ export interface UserInterface extends Document {
   email: string;
   telefone: string;
   senha: string;
-  creation: Date;
+  creat_At: Date;
 }
 
 const UserSchema = new Schema({
@@ -37,7 +37,7 @@ const UserSchema = new Schema({
     type: String,
     required: [true, 'Password is required']
   },
-  creation: {
+  creat_At: {
     type: Date,
     default: Date.now
   }
