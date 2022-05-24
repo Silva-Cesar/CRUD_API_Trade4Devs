@@ -1,0 +1,54 @@
+// operations from 2022/01 , cpf 22345678900
+
+{
+    _id:628c43c18bb3a8d8261360fc,
+    cpf:22345678900,
+    tipo:"entrada",
+    value:300.5,
+    creation:2022-01-10T02:32:33.426+00:00,
+    __v:0
+}
+
+{
+    _id:628c43ce8bb3a8d8261360fe,
+    cpf:22345678900,
+    tipo:"saida",
+    value:150,
+    creation:2022-01-16T02:32:46.835+00:00,
+    __v:0
+}
+
+{
+    _id:628c440d8bb3a8d826136100
+    cpf:22345678900
+    tipo:"entrada"
+    value:900
+    creation:2022-01-28T02:33:49.224+00:00
+    __v:0
+}
+
+{
+    _id:628c44188bb3a8d826136102,
+    cpf:22345678900,
+    tipo:"entrada",
+    value:5000,
+    creation:2022-01-30T02:34:00.773+00:00,
+    __v:0
+}
+
+
+// operations from 2022/01 inside a statement , cpf 22345678900
+
+{
+    "cpf": 22345678900,
+    "month": 1,
+    "year": 2022,
+    "operations": [
+        { "_id": "628c43c18bb3a8d8261360fc"
+        },
+        {"_id": "628c43ce8bb3a8d8261360fe"
+        },
+        {"_id": "628c440d8bb3a8d826136100"
+        }
+    ]
+}
