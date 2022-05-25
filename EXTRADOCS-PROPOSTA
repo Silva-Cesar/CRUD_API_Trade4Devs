@@ -45,8 +45,8 @@ Casos de Uso:
       - Operação
 ------
 -> Operação
-  - Remetente (id) (obrigatório)
-  - Destinatario (id) (obrigatório)
+  - Remetente (CPF) (obrigatório)
+  - Destinatario (CPF) (obrigatório)
   - Valor (obrigatório)
 
     -> Retorno

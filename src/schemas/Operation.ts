@@ -1,20 +1,20 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface OperationInterface extends Document {
-  remetente: number;
-  destinatario: number;
+  sender: number;
+  receiver: number;
   value: number;
   creat_At: Date;
 }
 
 const OperationSchema = new Schema({
-  remetente: {
+  sender: {
     type: Number,
-    required: [true, 'Remetente is required']
+    required: [true, 'Sender is required']
   },
-  destinatario: {
+  receiver: {
     type: Number,
-    required: [true, 'Destinatário is required']
+    required: [true, 'Receiver is required']
   },
   value: {
     type: Number,

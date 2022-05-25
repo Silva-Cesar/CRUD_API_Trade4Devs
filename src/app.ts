@@ -41,6 +41,12 @@ class App {
       console.log(`Application is running on port ${port}`)
     })
   }
+
+  public get(msg: string): void {
+    this.app.get('/', (req, res) => {
+      res.json({message: msg})
+    })
+  }
 }
 
 export default App;

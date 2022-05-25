@@ -24,12 +24,25 @@ class RegisterController extends Controller {
   // Função para criar um registro de usuário.
   // Ao ser criado o registro do usuário, é criado um documento na API de Saldo
   // com o CPF do usuário e o saldo com valor zero.
+  // Se algum dado estiver faltando ele retorna a mensagem avisando da falta, se algum dado
+  // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const register = await Register.create(req.body);
 
-    const balance = await Balance.create({ ...req.body, saldo: 0 });
+    try {
+      const register = await Register.create(req.body);
+      const balance = await Balance.create({ ...req.body, saldo: 0 });
+      return res.send('Conta criada com sucesso!');
+    } catch (error) {
 
-    return res.send('Conta criada com sucesso!');
+      if (error.errors === undefined) {
+        const duplicateData = Object.keys(error.keyValue);
+        return res.status(400).send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`)
+      }
+
+      const requiredData = Object.keys(error.errors);
+      return res.status(400).send(`${String(requiredData).toUpperCase()} é requerido!`);
+
+    }
   }
 
   // Função para deletar registro de usuário.
@@ -42,7 +55,10 @@ class RegisterController extends Controller {
 
     const balance = await Balance.deleteOne({cpf: register.cpf});
     
-    return res.send(`${register} ${balance}`);
+    return res.send(`
+    ${register} 
+    ${balance}
+    `);
   }
 }
 
