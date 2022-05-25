@@ -17,6 +17,6 @@ const app = new App([
     new LoginController()
 ]);
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
 
 app.get("Oi Express!");
