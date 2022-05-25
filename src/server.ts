@@ -18,3 +18,5 @@ const app = new App([
 ]);
 
 app.listen(3000);
+
+app.get("Oi Express!");
