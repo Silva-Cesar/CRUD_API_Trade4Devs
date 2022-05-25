@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
+  "author": "Jefferson Sena",
+  "license": "ISC",
   "scripts": {
     "dev": "nodemon src/server.ts",
     "start": "node src/server.ts"
   },
-  "author": "Jefferson Sena",
-  "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
