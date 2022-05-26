@@ -5,7 +5,8 @@ import RegisterController from './controllers/RegisterController';
 import StatementController from './controllers/StatementController';
 import LoginController from './controllers/LoginController';
 
-const PORT = Number(process.env.PORT) | 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 const app = new App([
   new OperationController(),
@@ -15,6 +16,6 @@ const app = new App([
   new LoginController(),
 ]);
 
-app.listen(PORT);
+app.listen(PORT, HOST);
 
 app.get('Oi Express!');
