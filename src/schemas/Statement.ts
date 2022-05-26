@@ -4,7 +4,7 @@ export interface StatementInterface extends Document {
   cpf: Number;
   month: Number;
   year: Number;
-  operation: [ ObjectId ];  
+  operations: [ ObjectId ];  
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;

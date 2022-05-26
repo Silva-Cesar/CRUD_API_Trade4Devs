@@ -4,7 +4,9 @@ export interface OperationInterface extends Document {
   sender: number;
   receiver: number;
   value: number;
-  creat_At: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
 }
 
 const OperationSchema = new Schema({
@@ -20,10 +22,13 @@ const OperationSchema = new Schema({
     type: Number,
     required: [true, 'Value is required']
   },
-  creat_At: {
+  deletedAt: {
     type: Date,
-    default: Date.now
+    default: null
   }
+},
+{
+  timestamps: true
 });
 
 export default model<OperationInterface>('Operation', OperationSchema);

@@ -22,9 +22,10 @@ class App {
   }
 
   private connectDataBase(): void {
-    mongoose.connect (
-      `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASS}@${process.env.MONGO_DB_CLUSTER}/crud-nodejs?retryWrites=true&w=majority`);
-      }
+    mongoose.connect(
+      `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASS}@${process.env.MONGO_DB_CLUSTER}/crud-nodejs?retryWrites=true&w=majority`
+    );
+  }
 
   private initExpressJson(): void {
     this.app.use(express.json());
@@ -33,19 +34,19 @@ class App {
   private initControllers(controllers: Controller[]): void {
     controllers.forEach((controller) => {
       this.app.use('/', controller.router);
-    })
+    });
   }
 
   public listen(port: number): void {
-    this.app.listen(port, () => {
-      console.log(`Application is running on port ${port}`)
-    })
+    this.app.listen(port, '0.0.0.0', () => {
+      console.log(`Application is running on port ${port}`);
+    });
   }
 
   public get(msg: string): void {
     this.app.get('/', (req, res) => {
-      res.json({message: msg})
-    })
+      res.json({ message: msg });
+    });
   }
 }
 
