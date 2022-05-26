@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import Balance from '../schemas/Balance';
 import Controller from './Controller';
 
-
-
 class BalanceController extends Controller {
   constructor() {
     super('/balance');
@@ -25,13 +23,13 @@ class BalanceController extends Controller {
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const balance = await Balance.create(req.body);
 
-    return res.send(balance)
+    return res.send(balance);
   }
 
   private async findById(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const bodyReq = req.body;
 
-    const {id} = req.params;
+    const { id } = req.params;
 
     if (!bodyReq.cpf) {
       return res.status(400).send('Invalid user Id');
@@ -39,14 +37,14 @@ class BalanceController extends Controller {
 
     const balance = await Balance.findById(id);
 
-    if(!balance) {
+    if (!balance) {
       return res.status(404).send('Balance field does not exist for this account.');
     }
 
     return res.send(balance);
   }
 
-// Remover edit caso essa função seja executada pela operação
+  // Remover edit caso essa função seja executada pela operação
   private async edit(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { id } = req.params;
     await Balance.findByIdAndUpdate(id, req.body);
@@ -56,12 +54,12 @@ class BalanceController extends Controller {
 
   private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { id } = req.params;
-    const balance = await Balance.findById(id);
-    balance.deleteOne();
-    return res.send(balance);
-  }
+    // const balance = await Balance.findById(id);
+    // balance?.deleteOne();
 
+    await Balance.deleteOne({ id });
+    return res.status(204);
+  }
 }
 
 export default BalanceController;
-
