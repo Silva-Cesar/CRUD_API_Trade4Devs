@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Operation from '../schemas/Operation';
 import Controller from './Controller';
-import Product from '../schemas/Product';
+//import Product from '../schemas/Product';
 
 
 class OperationController extends Controller {
@@ -16,9 +16,10 @@ class OperationController extends Controller {
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const testLink = await Product.findOneAndUpdate({price: 800}, {$inc: {quantity: -30}});
+    //const testLink = await Product.findOneAndUpdate({price: 800}, {$inc: {quantity: -30}});
     const operation = await Operation.find();
-    return res.send(testLink);
+    //return res.send(testLink);
+    return res.send(operation);
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {

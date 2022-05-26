@@ -9,9 +9,9 @@ class StatementController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.list);
-    this.router.get(`${this.path}/all`, this.listAll);
-    this.router.post(this.path, this.create);
+    this.router.get(this.path, this.list); // recebe mes e cpf (e ano) - quem chama é o front
+    this.router.get(`${this.path}/all`, this.listAll); // recebe mes e cpf (e ano) - quem chama é o front
+    this.router.post(this.path, this.create); // recebe APENAS o id da operação
     this.router.get(`${this.path}/:cpf`, this.findByCPF);
     //this.router.get(`${this.path}/:id`, this.findById);
     //this.router.put(`${this.path}/:id`, this.edit);

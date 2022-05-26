@@ -7,7 +7,9 @@ export interface RegisterInterface extends Document {
   birth_date: Date;
   cpf: number;
   password: string;
-  creat_At: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
 }
 
 const RegisterSchema = new Schema({
@@ -38,10 +40,13 @@ const RegisterSchema = new Schema({
     type: String,
     required: [true, 'Name is required']
   },
-  creat_At: {
+  deletedAt: {
     type: Date,
-    default: Date.now
+    default: null
   }
+},
+{
+  timestamps: true
 });
 
 export default model<RegisterInterface>('Register', RegisterSchema);
