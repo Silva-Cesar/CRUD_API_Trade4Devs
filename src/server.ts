@@ -7,16 +7,18 @@ import RegisterController from './controllers/RegisterController';
 import StatementController from './controllers/StatementController';
 import LoginController from './controllers/LoginController';
 
-const app = new App([ 
-    new ProductController(), 
-    new  UserController(), 
-    new OperationController(), 
-    new BalanceController(), 
-    new RegisterController(), 
-    new StatementController(),
-    new LoginController()
+const PORT = Number(process.env.PORT) | 3000;
+
+const app = new App([
+  new ProductController(),
+  new UserController(),
+  new OperationController(),
+  new BalanceController(),
+  new RegisterController(),
+  new StatementController(),
+  new LoginController(),
 ]);
 
-app.listen(3000);
+app.listen(PORT);
 
-app.get("Oi Express!");
+app.get('Oi Express!');
