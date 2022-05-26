@@ -27,21 +27,20 @@ class RegisterController extends Controller {
   // Se algum dado estiver faltando ele retorna a mensagem avisando da falta, se algum dado
   // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
-
     try {
       const register = await Register.create(req.body);
       const balance = await Balance.create({ ...req.body, saldo: 0 });
       return res.send('Conta criada com sucesso!');
     } catch (error) {
-
-      if (error.errors === undefined) {
-        const duplicateData = Object.keys(error.keyValue);
-        return res.status(400).send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`)
+      if (error?.errors) {
+        const duplicateData = Object.keys(error?.keyValue);
+        return res
+          .status(409)
+          .send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
       }
 
       const requiredData = Object.keys(error.errors);
       return res.status(400).send(`${String(requiredData).toUpperCase()} é requerido!`);
-
     }
   }
 
@@ -51,10 +50,9 @@ class RegisterController extends Controller {
     const { id } = req.params;
 
     const register = await Register.findById(id);
-    register.deleteOne();
+    const balance = await Balance.deleteOne({ cpf: register?.cpf });
+    register?.deleteOne();
 
-    const balance = await Balance.deleteOne({cpf: register.cpf});
-    
     return res.send(`
     ${register} 
     ${balance}
