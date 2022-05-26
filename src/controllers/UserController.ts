@@ -53,8 +53,8 @@ class UserController extends Controller {
   private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { id } = req.params;
     const users = await User.findById(id);
-    users.deleteOne();
-    return res.send(users);
+    users?.deleteOne();
+    return res.status(204);
   }
 }
 

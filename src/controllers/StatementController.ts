@@ -26,37 +26,31 @@ class StatementController extends Controller {
     } else {
       return res.status(400).send('Nenhum extrato encontrado');
     }
-
   }
 
   private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
-
     return res.send(await Statement.find().populate('operations'));
-
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
-
-
-
     // verificar se os ids que vierem em " operations " sao do tipo Operation mesmo!!!
 
-    return res.send(await Statement.updateOne(
-      {
-        month: req.body.month,
-        year: req.body.year,
-        cpf: req.body.cpf,
-      },
-      {
-        $addToSet: { operations: { $each: req.body.operations } },
-      },
-      {
-        upsert: true,
-        runValidators: true
-      }
-
-    ));
-
+    return res.send(
+      await Statement.updateOne(
+        {
+          month: req.body.month,
+          year: req.body.year,
+          cpf: req.body.cpf,
+        },
+        {
+          $addToSet: { operations: { $each: req.body.operations } },
+        },
+        {
+          upsert: true,
+          runValidators: true,
+        }
+      )
+    );
   }
 
   private async findByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
@@ -66,15 +60,13 @@ class StatementController extends Controller {
     //      return res.status(400).send('Id Inválido');
     //    }
 
-    const statement = await Statement.find({ 'cpf': cpf });
+    const statement = await Statement.find({ cpf: cpf });
 
     if (statement.length > 0) {
       return res.send(statement);
     } else {
       return res.status(400).send('Extrato não encontrado');
     }
-
-
   }
 
   private async findById(req: Request, res: Response, next: NextFunction): Promise<Response> {
@@ -102,9 +94,10 @@ class StatementController extends Controller {
 
   private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { id } = req.params;
-    const statement = await Statement.findById(id);
-    statement.deleteOne();
-    return res.send(statement);
+    // const statement = await Statement.findById(id);
+    // statement.deleteOne();
+    await Statement.deleteOne({ id });
+    return res.status(204);
   }
 }
 

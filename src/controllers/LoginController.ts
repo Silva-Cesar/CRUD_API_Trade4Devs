@@ -12,15 +12,14 @@ class LoginController extends Controller {
   }
 
   // FUNÇÃO PRINCIPAL DA API DE LOGIN
-  // Função para varrer a base de dados de Registro e buscar por um registro que contenha o 
+  // Função para varrer a base de dados de Registro e buscar por um registro que contenha o
   // CPF e o Password solicitado na requisição.
   private async getLogin(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const bodyReq = req.body;
 
-    const bodyReq = req.body
+    const login = await Register.find({ ...req.body });
 
-    const login = await Register.find({...req.body});
-
-    if (login.length === 0) {
+    if (!login.length) {
       return res.status(401).send('CPF e/ou Senha incorreto(s).');
     }
 
