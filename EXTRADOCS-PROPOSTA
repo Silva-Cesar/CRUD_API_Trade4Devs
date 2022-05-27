@@ -1,60 +1,81 @@
 // --------------------------------------------------------------
-Proposta: Criar uma camada de API's para: Criação de conta, Consulta de saldo, Adicionar valor, Subtrair valor, Consulta de extrato
+
+## Proposta: Criar uma camada de API's para: Criação de conta, Consulta de saldo, Adicionar valor, Subtrair valor, Consulta de extrato
+
 // --------------------------------------------------------------
 
-Regras:
+## Regras:
+
 O desafio deverá ser realizado em grupos de 3 integrantes;
 Um integrante do grupo deverá enviar o nome dos participantes do seu grupo para a Noelle até segunda-feira.
 
-A entrega deverá ser feita até dia 30. Iremos agendar uma data posterior ao dia 30 para apresentação. 
+A entrega deverá ser feita até dia 30. Iremos agendar uma data posterior ao dia 30 para apresentação.
 
 A entrega deverá ser feita na seguinte forma:
+
 - Link do Git ou Google Drive com os arquivos;
 - Pdf ou Pptx com apresentação da solução contendo Prints do que foi feito;
-// --------------------------------------------------------------
+  // --------------------------------------------------------------
 
-Casos de Uso:
+## Casos de Uso:
 
-------
--> Login
-  - Usuario
-  - Senha
+## -> Login
 
-    -> Retorno
-      - Sucesso ou Erro 
-------
--> Criação de Conta
-  - Nome;
-  - E-mail;
-  - Telefone;
-  - Nascimento;
-  - Cpf
-  - "Usuário = e-mail?" 
-  - "Senha?"
+- Usuario (CPF)
+- Senha
 
-    -> Retorno
-      - Resultado (erro ou ok);
-------
--> Extrato
-  - Cpf (obrigatório)
-  - Mês (opcional)
+  -> Retorno
 
-    -> Retorno:
-      - Valor 
-      - DataHora
-      - Operação
-------
--> Operação
-  - Remetente (CPF) (obrigatório)
-  - Destinatario (CPF) (obrigatório)
-  - Valor (obrigatório)
+  - Sucesso ou Erro
 
-    -> Retorno
-      - Resultado (erro ou ok);
-------
--> Saldo
-  - Cpf
+---
 
-    -> Retorno
-      - Valor;
-------
+## -> Criação de Conta
+
+- CPF
+- Nome;
+- E-mail;
+- Telefone;
+- Nascimento;
+- "Senha?"
+
+  -> Retorno
+
+  - Sucesso ou Erro
+
+---
+
+## -> Extrato
+
+- Cpf (obrigatório)
+- Mês (opcional)
+
+  -> Retorno:
+
+  - Valor
+  - DataHora
+  - Operação
+
+---
+
+## -> Operação
+
+- Remetente (CPF) (obrigatório)
+- Destinatario (CPF) (obrigatório)
+- Valor (obrigatório)
+
+  -> Retorno
+
+  - Resultado (erro ou ok);
+
+---
+
+## -> Saldo
+
+- Cpf
+
+  -> Retorno
+
+  - Valor;
+
+---
