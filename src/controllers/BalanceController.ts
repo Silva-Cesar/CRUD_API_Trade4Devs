@@ -18,6 +18,7 @@ class BalanceController extends Controller {
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const balance = await Balance.find();
     return res.send(balance);
+    // return res.send('Saldo dos usuários'); - No projeto final usar esse return
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {

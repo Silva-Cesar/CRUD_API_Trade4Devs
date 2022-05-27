@@ -1,6 +1,7 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface BalanceInterface extends Document {
+  name: string;
   cpf: number;
   saldo: number;
   createdAt: Date;
@@ -9,6 +10,10 @@ export interface BalanceInterface extends Document {
 }
 
 const BalanceSchema = new Schema({
+  name: {
+    type: String,
+    required: [true, 'Name number is required']
+  },
   cpf: {
     type: Number,
     unique: true,

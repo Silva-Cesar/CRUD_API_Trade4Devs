@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Register from '../schemas/Register';
 import Controller from './Controller';
-import Balance from '../schemas/Balance';
 
 class RegisterController extends Controller {
   constructor() {
@@ -18,6 +17,7 @@ class RegisterController extends Controller {
   private async getAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const register = await Register.find().select({ email: 0, password: 0, __v: 0 });
     return res.send(register);
+    // return res.send('Registro de todos os usuários'); - No projeto final usar esse return
   }
 
   // FUNÇÃO PRINCIPAL DA API DE REGISTRO
@@ -28,15 +28,27 @@ class RegisterController extends Controller {
   // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     try {
+      
       const register = await Register.create(req.body);
-      const balance = await Balance.create({ ...req.body, saldo: 0 });
+      
+      const axios = require('axios').default;
+      
+      axios.post('http://127.0.0.1:3000/balance', {
+        name: req.body.name,
+        cpf: req.body.cpf,
+        saldo: 0
+      }).then(function (response: any) {
+        console.log(response.data);
+      }).catch(function (error: any) {
+        console.log(error);
+      });
+
       return res.send('Conta criada com sucesso!');
+      
     } catch (error) {
-      if (error?.errors) {
-        const duplicateData = Object.keys(error?.keyValue);
-        return res
-          .status(409)
-          .send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
+      if (error.errors === undefined) {
+        const duplicateData = Object.keys(error.keyValue);
+        return res.status(409).send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
       }
 
       const requiredData = Object.keys(error.errors);
@@ -50,13 +62,10 @@ class RegisterController extends Controller {
     const { id } = req.params;
 
     const register = await Register.findById(id);
-    const balance = await Balance.deleteOne({ cpf: register?.cpf });
+    // const balance = await Balance.deleteOne({ cpf: register?.cpf });
     register?.deleteOne();
 
-    return res.send(`
-    ${register} 
-    ${balance}
-    `);
+    return res.send(register);
   }
 }
 

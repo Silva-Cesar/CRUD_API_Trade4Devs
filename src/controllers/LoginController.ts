@@ -15,16 +15,17 @@ class LoginController extends Controller {
   // Função para varrer a base de dados de Registro e buscar por um registro que contenha o
   // CPF e o Password solicitado na requisição.
   private async getLogin(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const login = await Register.find({
+
+    const login = await Register.find({ 
       cpf: req.body.cpf,
-      password: req.body.password,
-    });
+      password: req.body.password
+     });
 
     if (!login.length) {
       return res.status(401).send('CPF e/ou Senha incorreto(s).');
     }
 
-    return res.send('Login efetuado com sucesso!');
+    return res.status(200).send('Login efetuado com sucesso!');
   }
 }
 
