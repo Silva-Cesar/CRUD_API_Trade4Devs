@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Register from '../schemas/Register';
+import Balance from '../schemas/Balance';
 import { authMiddleware } from '../utils/middlewares/authMiddleware';
 import Controller from './Controller';
 
@@ -9,8 +10,9 @@ class RegisterController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, authMiddleware, this.getAll);
-    this.router.post(this.path, authMiddleware, this.create);
+    this.router.get(this.path, this.getAll); //  authMiddleware,
+    this.router.get(`${this.path}/cpf`, this.getByCPF);
+    this.router.post(this.path, this.create); //  authMiddleware,
     this.router.delete(`${this.path}/:id`, authMiddleware, this.delete);
   }
 
@@ -19,6 +21,12 @@ class RegisterController extends Controller {
     const register = await Register.find(); //.select({ email: 0, password: 0, __v: 0 });
     return res.send(register);
     // return res.send('Registro de todos os usuários'); - No projeto final usar esse return
+  }
+
+  private async getByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const { cpf } = req.body
+    const register = await Register.find({cpf});
+    return res.send(register);
   }
 
   // FUNÇÃO PRINCIPAL DA API DE REGISTRO
@@ -31,20 +39,7 @@ class RegisterController extends Controller {
     try {
       const register = await Register.create(req.body);
 
-      const axios = require('axios').default;
-
-      axios
-        .post('http://127.0.0.1:3000/balance', {
-          name: req.body.name,
-          cpf: req.body.cpf,
-          saldo: 0,
-        })
-        .then(function (response: any) {
-          console.log(response.data);
-        })
-        .catch(function (error: any) {
-          console.log(error);
-        });
+      const balance = await Balance.create({ ...req.body, saldo: 0})
 
       return res.send('Conta criada com sucesso!');
     } catch (error) {
