@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Register from '../schemas/Register';
+import Balance from '../schemas/Balance';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
 import Controller from './Controller';
 
 class RegisterController extends Controller {
@@ -8,16 +10,23 @@ class RegisterController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.getAll);
-    this.router.post(this.path, this.create);
-    this.router.delete(`${this.path}/:id`, this.delete);
+    this.router.get(this.path, this.getAll); //  authMiddleware,
+    this.router.get(`${this.path}/cpf`, this.getByCPF);
+    this.router.post(this.path, this.create); //  authMiddleware,
+    this.router.delete(`${this.path}/:id`, authMiddleware, this.delete);
   }
 
   // Função para retornar todos os registros escondendo e-mail e password.
   private async getAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const register = await Register.find().select({ email: 0, password: 0, __v: 0 });
+    const register = await Register.find(); //.select({ email: 0, password: 0, __v: 0 });
     return res.send(register);
     // return res.send('Registro de todos os usuários'); - No projeto final usar esse return
+  }
+
+  private async getByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const { cpf } = req.body
+    const register = await Register.find({cpf});
+    return res.send(register);
   }
 
   // FUNÇÃO PRINCIPAL DA API DE REGISTRO
@@ -28,27 +37,17 @@ class RegisterController extends Controller {
   // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     try {
-      
       const register = await Register.create(req.body);
-      
-      const axios = require('axios').default;
-      
-      axios.post('http://127.0.0.1:3000/balance', {
-        name: req.body.name,
-        cpf: req.body.cpf,
-        saldo: 0
-      }).then(function (response: any) {
-        console.log(response.data);
-      }).catch(function (error: any) {
-        console.log(error);
-      });
+
+      const balance = await Balance.create({ ...req.body, saldo: 0})
 
       return res.send('Conta criada com sucesso!');
-      
     } catch (error) {
       if (error.errors === undefined) {
         const duplicateData = Object.keys(error.keyValue);
-        return res.status(409).send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
+        return res
+          .status(409)
+          .send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
       }
 
       const requiredData = Object.keys(error.errors);
