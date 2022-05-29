@@ -37,9 +37,9 @@ class App {
     });
   }
 
-  public listen(port: number): void {
-    this.app.listen(port, '0.0.0.0', () => {
-      console.log(`Application is running on port ${port}`);
+  public listen(port: number, host: string): void {
+    this.app.listen(port, host, () => {
+      console.log(`Application is running on host ${host} port ${port}`);
     });
   }
 

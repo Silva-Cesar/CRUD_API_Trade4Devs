@@ -1,29 +1,34 @@
 import { model, Schema, Document } from 'mongoose';
 
 export interface OperationInterface extends Document {
-  sender: number;
-  receiver: number;
+  sender: string;
+  receiver: string;
   value: number;
-  creat_At: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
 }
 
 const OperationSchema = new Schema({
   sender: {
-    type: Number,
+    type: String,
     required: [true, 'Sender is required']
   },
   receiver: {
-    type: Number,
+    type: String,
     required: [true, 'Receiver is required']
   },
   value: {
     type: Number,
     required: [true, 'Value is required']
   },
-  creat_At: {
+  deletedAt: {
     type: Date,
-    default: Date.now
+    default: null
   }
+},
+{
+  timestamps: true
 });
 
 export default model<OperationInterface>('Operation', OperationSchema);

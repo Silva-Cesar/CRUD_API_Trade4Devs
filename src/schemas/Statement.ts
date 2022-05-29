@@ -1,10 +1,10 @@
 import { model, Schema, Document, ObjectId } from 'mongoose';
 
 export interface StatementInterface extends Document {
-  cpf: Number;
-  month: Number;
-  year: Number;
-  operation: [ ObjectId ];  
+  cpf: string;
+  month: number;
+  year: number;
+  operations: [ ObjectId ];  
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -12,15 +12,11 @@ export interface StatementInterface extends Document {
 
 const StatementSchema = new Schema({
   cpf: {
-    type: Number,
-    //min: 11,
-    //max: 12,
+    type: String,
     required: [true, 'CPF is required']
   },
   month: {
     type: Number,
-    //min: 1,
-    //max: 12,
     required: [true, 'Month is required']
   },
   year: {
