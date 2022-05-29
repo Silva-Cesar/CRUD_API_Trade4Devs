@@ -57,7 +57,9 @@ class BalanceController extends Controller {
     const { cpf, value } = req.body;
     const updateBalance = await Balance.findOneAndUpdate({ cpf: cpf }, { $inc: {saldo: value}});
 
-    return res.send(updateBalance);
+    const newBalance = await Balance.find({ cpf });
+
+    return res.send(newBalance);
   }
 
   private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
