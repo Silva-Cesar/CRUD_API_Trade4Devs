@@ -16,7 +16,7 @@ class RegisterController extends Controller {
 
   // Função para retornar todos os registros escondendo e-mail e password.
   private async getAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const register = await Register.find(); //.select({ email: 0, password: 0, __v: 0 });
+    const register = await Register.find().select({ email: 0, password: 0, __v: 0 });
     return res.send(register);
     // return res.send('Registro de todos os usuários'); - No projeto final usar esse return
   }

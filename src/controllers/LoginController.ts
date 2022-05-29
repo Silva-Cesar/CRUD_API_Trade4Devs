@@ -16,8 +16,8 @@ class LoginController extends Controller {
   // Função para varrer a base de dados de Registro e buscar por um registro que contenha o
   // CPF e o Password solicitado na requisição.
   private async getLogin(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const jwtToken: string = process.env.JWT_TOKEN || 'my_super_secret';
-    const expiresIn: number = Number(process.env.JWT_EXPIRES_IN) || 60 * 10
+    const jwtToken: string = process.env.JWT_SECRET || 'my_super_secret';
+    const expiresIn: number = Number(process.env.JWT_EXPIRES_IN) || 600
 
     const { cpf, password } = req.body;
     const login = await Register.findOne({ cpf, password });
@@ -27,11 +27,11 @@ class LoginController extends Controller {
     }
 
     const data = { 
-      name: login.name
+      cpf: login.cpf
     }
 
     const token = jwt.sign({ data }, jwtToken, { expiresIn });
-    const response = {accessToken: token}
+    const response = {statusLogin: 'Sucesso',token: token}
 
     return res.status(200).send(response);
   }
