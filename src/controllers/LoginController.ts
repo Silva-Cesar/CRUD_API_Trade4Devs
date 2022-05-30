@@ -13,16 +13,19 @@ class LoginController extends Controller {
     this.router.post(this.path, this.getLogin);
   }
 
-  // FUNÇÃO PRINCIPAL DA API DE LOGIN
+  // FUNÇÃO PRINCIPAL DA API LOGIN
   // Função para varrer a base de dados de Registro e buscar por um registro que contenha o
   // CPF e o Password solicitado na requisição.
   private async getLogin(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const jwtToken: string = process.env.JWT_SECRET || 'my_super_secret';
-    const expiresIn: number = Number(process.env.JWT_EXPIRES_IN) || 600
 
-    const { cpf, password } = req.body;
-    const login = await Register.findOne({ cpf });
+    const jwtToken: string = process.env.JWT_SECRET || 'my_super_secret'; // Recebe a chave para complemento do token.
+    const expiresIn: number = Number(process.env.JWT_EXPIRES_IN) || 600;  // Define tempo de duração do token.
 
+    const { cpf, password } = req.body; // Recebe CPF e Password da requisição.
+    const login = await Register.findOne({ cpf }); // Busca na base de Registro o CPF solicitado
+
+    // Verifica o resultado do login, tendo login verifica se a senha está correta com a senha do mesmo login.
+    // Senha passa por uma encriptação antes de realizar o teste.
     if (login) {
 
       if (await bcrypt.compare(password, login.password)) {
@@ -37,7 +40,7 @@ class LoginController extends Controller {
 
       }
     }
-    return res.status(401).send('CPF e/ou Senha incorreto(s).');
+    return res.status(401).send('CPF e/ou Senha incorreto(s).'); // Se cpf e/ou senha estiverem incorretos retorna erro.
   }
 }
 

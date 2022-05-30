@@ -3,7 +3,7 @@ import 'dotenv/config';
 export class Constants {
 
     // NodeJS
-    static readonly SERVER_PORT: number = Number(process.env.PORT) || 4000;
+    static readonly SERVER_PORT: number = Number(process.env.PORT) || 3000;
     static readonly SERVER_HOST: string = process.env.HOST || '0.0.0.0';
 
     // MongoDB

@@ -5,6 +5,7 @@ import Register from '../schemas/Register';
 import Controller from './Controller';
 import { Types } from 'mongoose';
 import { Constants } from '../utils/Constants';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
 
 
 class OperationController extends Controller {
@@ -15,17 +16,19 @@ class OperationController extends Controller {
   protected initRoutes(): void {
     this.router.get(this.path, this.list);
     this.router.post(this.path, this.create);
-    this.router.delete(this.path, this.delete); //`${this.path}/:id`
+    this.router.delete(`${this.path}/:id`, this.delete);
   }
 
+  // Função criada para testes em ambiente de desenvolvimento.
+  // Retorna todas as operações feitas.
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const operation = await Operation.find();
 
     return res.send(operation);
   }
 
-  // Função principal de Operation
-  // Função para realizar a operação de transferência.
+  // FUNÇÃO PRINCIPAL DA API OPERATION
+  // Função para realizar a operação de transferência entre dois CPFs.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
 
     const bodyReq = req.body;
@@ -42,7 +45,7 @@ class OperationController extends Controller {
       return res.status(400).send('CPF de remetente e/ou destinatário não encontrado(s).');
     };
 
-    if (checkBalance[0].saldo < bodyReq.value) {
+    if (checkBalance[0].balance < bodyReq.value) {
       return res.status(400).send('Operação cancelada - Saldo insulficiente!');
     };
 
@@ -54,8 +57,8 @@ class OperationController extends Controller {
     }
     
     // Faz alteração no Balance, incrementa em receiver o valor transferido e decrementa em sender.
-    const senderUser = await Balance.findOneAndUpdate({ cpf: sender }, { $inc: {saldo: -value} });
-    const receiverUser = await Balance.findOneAndUpdate({ cpf: receiver }, { $inc: {saldo: value} });
+    const senderUser = await Balance.findOneAndUpdate({ cpf: sender }, { $inc: {balance: -value} });
+    const receiverUser = await Balance.findOneAndUpdate({ cpf: receiver }, { $inc: {balance: value} });
     
 
     // chamar api extrato
@@ -63,11 +66,10 @@ class OperationController extends Controller {
     const axios = require('axios').default;
     const date = new Date();
 
-    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement`, {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/`, {
       cpf : sender,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
-      //operations : `[{${id}}]`
       operations : [{_id : id}]
     })
     //.then(function (response) {
@@ -81,11 +83,10 @@ class OperationController extends Controller {
         console.log(error);        
     });
 
-    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement`, {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/`, {
       cpf : receiver,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
-      //operations : `[{${id}}]`
       operations : [{_id : id}]
     })
     //.then(function (response) {
@@ -103,12 +104,12 @@ class OperationController extends Controller {
 
   }
 
-  // Criar função para validar as duas casas decimais!!!
-
+  // Função criada para testes em ambiente de desenvolvimento.
+  // Função para deletar uma operação pelo seu Id.
   private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { id } = req.params;
-    const operation = await Operation.deleteMany({});
-    // operation.deleteOne();
+    const operation = await Operation.findById(id);
+    operation?.deleteOne();
     return res.send("Deleted");
   }
 }
