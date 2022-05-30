@@ -3,6 +3,8 @@ import Register from '../schemas/Register';
 import Controller from './Controller';
 import jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
+import { Constants } from '../utils/Constants';
+
 
 class LoginController extends Controller {
   constructor() {
@@ -17,8 +19,8 @@ class LoginController extends Controller {
   // Função para varrer a base de dados de Registro e buscar por um registro que contenha o
   // CPF e o Password solicitado na requisição.
   private async getLogin(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const jwtToken: string = process.env.JWT_SECRET || 'my_super_secret';
-    const expiresIn: number = Number(process.env.JWT_EXPIRES_IN) || 600
+    const jwtToken: string = Constants.JWT_SECRET
+    const expiresIn: number = Constants.JWT_EXPIRES_IN
 
     const { cpf, password } = req.body;
     const login = await Register.findOne({ cpf });
