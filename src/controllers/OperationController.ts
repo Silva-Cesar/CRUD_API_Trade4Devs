@@ -13,19 +13,25 @@ class OperationController extends Controller {
 
   protected initRoutes(): void {
     this.router.get(this.path, this.list);
+    this.router.get(`${this.path}/cpf/:cpf`, this.listByCPF);
     this.router.get(`${this.path}/all`, this.listAll);
     this.router.post(this.path, this.create);
     this.router.delete(this.path, this.delete); //`${this.path}/:id`
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
+
+    return res.status(200).send('Base de dados de Operações.');
+  }
+
+  private async listByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { cpf } = req.params;
 
     if (!cpf) {
       return res.status(400).send('Digite um CPF!');
     }
 
-    const operation = Operation.find({ cpf });
+    const operation = await Operation.find({ sender: `${cpf}` });
 
     return res.status(200).send(operation);
   }
