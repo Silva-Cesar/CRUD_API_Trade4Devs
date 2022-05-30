@@ -29,6 +29,10 @@ class OperationController extends Controller {
 
     const bodyReq = req.body;
 
+    if (bodyReq.value != Number(bodyReq.value).toFixed(2)) {
+      return res.status(400).send('Valor com mais de duas casas decimais!')
+    };
+
     const findSender = await Register.find({ cpf: bodyReq.sender });
     const findReceiver = await Register.find({ cpf: bodyReq.receiver });
     const checkBalance = await Balance.find({ cpf: bodyReq.sender });
