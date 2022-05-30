@@ -39,18 +39,21 @@ class StatementController extends Controller {
 
         // resolver horario que nao esta em UTC
 
-        console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+        //console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
 
 
         return res.send(await Statement.find(
           {
-            cpf: cpf
+            cpf: cpf,
+            year : year,
+            month : month
           })
           .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-          .where(Operation
-            .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+          //.where(Operation
+          //  .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } }))
             .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-          ));
+        //)
+          );
 
 
       }
@@ -59,33 +62,38 @@ class StatementController extends Controller {
 
         // resolver horario que nao esta em UTC
 
-        console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+        //console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
 
         if (month > new Date().getUTCMonth()) {
           // mes do ano anterior
           return res.send(await Statement.find(
             {
-              cpf: cpf
+              cpf: cpf,
+              year : `${year} - 1`,
+              month : month
             })
             .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-            .where(Operation
-              .find({ createdAt: { $gte: new Date(new Date().getUTCFullYear() - 1, month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear() - 1, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+            //.where(Operation
+              //.find({ createdAt: { $gte: new Date(new Date().getUTCFullYear() - 1, month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear() - 1, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
               .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-            ));
+              //)
+            );
 
         } else {
           // mes do ano corrente
 
           return res.send(await Statement.find(
             {
-              cpf: cpf
+              cpf: cpf,
+              month : month,
+              year : year
             })
             .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-            .where(Operation
-              .find({ createdAt: { $gte: new Date(new Date().getUTCFullYear(), month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear(), month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+            //.where(Operation  
+            //.find({ createdAt: { $gte: new Date(new Date().getUTCFullYear(), month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear(), month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
               .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-            ));
-
+              //)
+            );
         }
       }
 
