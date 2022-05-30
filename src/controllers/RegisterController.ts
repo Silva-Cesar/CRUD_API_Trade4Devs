@@ -4,6 +4,8 @@ import Balance from '../schemas/Balance';
 import { authMiddleware } from '../utils/middlewares/authMiddleware';
 import Controller from './Controller';
 import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
 
 class RegisterController extends Controller {
   constructor() {
@@ -11,9 +13,9 @@ class RegisterController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.getAll); //  authMiddleware,
-    this.router.get(`${this.path}/cpf`, this.getByCPF);
-    this.router.post(this.path, this.create); //  authMiddleware,
+    this.router.get(this.path, authMiddleware, this.getAll); // Remover esta funcão
+    this.router.get(`${this.path}/me`, authMiddleware, this.getUserInfo);
+    this.router.post(this.path, this.create);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.delete);
   }
 
@@ -24,9 +26,11 @@ class RegisterController extends Controller {
     // return res.send('Registro de todos os usuários'); - No projeto final usar esse return
   }
 
-  private async getByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { cpf } = req.body
-    const register = await Register.find({cpf});
+  private async getUserInfo(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const token = req.headers.authorization!
+    const { data }: any = jwt.decode(token)
+    const cpf = data.cpf
+    const register = await Register.find({cpf}).select({password: 0, __v: 0 });
     return res.send(register);
   }
 
