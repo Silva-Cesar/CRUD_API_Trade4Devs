@@ -66,38 +66,30 @@ class OperationController extends Controller {
     const axios = require('axios').default;
     const date = new Date();
 
-    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/`, {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/add`, {
       cpf : sender,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
       operations : [{_id : id}]
     })
-    //.then(function (response) {
-    //  console.log(response);
       .then(function (response: any) {
         console.log(response);        
     })
-    //.catch(function (error) {
-    //  console.log(error);
       .catch(function (error: any) {
         console.log(error);        
     });
 
-    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/`, {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/add`, {
       cpf : receiver,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
       operations : [{_id : id}]
     })
-    //.then(function (response) {
-    //  console.log(response);
-      .then(function () {
-        console.log();        
+      .then(function (response: any) {
+        console.log(response);        
     })
-    //.catch(function (error) {
-    //  console.log(error);
-      .catch(function () {
-        console.log();        
+      .catch(function (error: any) {
+        console.log(error);        
     });
 
     return res.status(200).send('Transferência realizada com sucesso!');
