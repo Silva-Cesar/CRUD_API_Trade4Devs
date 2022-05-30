@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Statement from '../schemas/Statement';
 import Controller from './Controller';
-//import { Types } from 'mongoose';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
 import Operation from '../schemas/Operation';
 
@@ -11,83 +10,99 @@ class StatementController extends Controller {
   }
 
   protected initRoutes(): void {
-    //this.router.get(`${this.path}/:cpf`, this.listByCPF);
-    //this.router.get(`${this.path}/:cpf/:month`, this.list); 
-    //this.router.get(`${this.path}/:cpf/:month/:year`, this.listAll); 
-    //this.router.get(`${this.path}/:cpf/:month/:year/:timezone`, this.listAll); 
+
     this.router.post(`${this.path}/add`, this.create);
     this.router.post(`${this.path}/list`, this.list);
 
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    //const statements = await Statement.find();
 
-    //if (statements.length > 0) {
-    //  return res.send(statements);
-    //} else {
-    //  return res.status(400).send('Nenhum extrato encontrado');
-    //}
-
-    const cpf = req.body.cpf;
-    const month = req.body.month;
-    const year = req.body.year;
-    //const timezone = req.body.timezone;
-    const days = req.body.days; // dias retroativos ao dia atual
+    const { cpf, month, year, days } = req.body;
 
     if (cpf) {
 
       if (days) {
 
-        console.log(days, "/" , cpf);
-
-        //const query = Statement.find();
-        //query.setOptions({lean : true});
-        //(await query).forEach(Statement.operations);
-        //query.where('createdAt').gte(Date.now() - days*24*60*60*1000).exec(callback);
-
-        const statement = await Statement.find({'cpf': cpf});
-        //const statement = await Statement.find() ;
-        console.log(statement);
-        return res.send(statement );
-
-        return res.send ( await Statement.find(
+        return res.send(await Statement.find(
           {
-            cpf : cpf
-            //operations.operation.createdAt : {$gte: Date.now() - days*24*60*60*1000}
+            cpf: cpf
+          })
+          .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+          .where(Operation
+            .find({ createdAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } })
+            .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+          ));
+      }
 
-          }).populate('operations').where(Operation.find( {createdAt : { $gte: Date.now() - days*24*60*60*1000}})));
-        //if (timezone) {
-          // todos os extratos do cpf no timezone solicitado
+      if ((year) && (month)) {
 
-        //} else {
-          // todos os extratos 
+        // resolver horario que nao esta em UTC
 
-        //}
+        console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+
+
+        return res.send(await Statement.find(
+          {
+            cpf: cpf
+          })
+          .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+          .where(Operation
+            .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+            .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+          ));
+
 
       }
 
-      //if (!month) {
-        // todos os extratos do cpf
+      if (month) {
 
-        //if (timezone) {
-          // todos os extratos do cpf no timezone solicitado
+        // resolver horario que nao esta em UTC
 
-        //} else {
-          // todos os extratos 
+        console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
 
-        //}
-     // }
+        if (month > new Date().getUTCMonth()) {
+          // mes do ano anterior
+          return res.send(await Statement.find(
+            {
+              cpf: cpf
+            })
+            .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+            .where(Operation
+              .find({ createdAt: { $gte: new Date(new Date().getUTCFullYear() - 1, month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear() - 1, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+              .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+            ));
+
+        } else {
+          // mes do ano corrente
+
+          return res.send(await Statement.find(
+            {
+              cpf: cpf
+            })
+            .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+            .where(Operation
+              .find({ createdAt: { $gte: new Date(new Date().getUTCFullYear(), month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear(), month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+              .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+            ));
+
+        }
+      }
+
+      return res.send(await Statement.find(
+        {
+          cpf: cpf
+        })
+        .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+        //.where(Operation
+        .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+        // )
+      );
 
     }
 
-
     return res.status(400);
 
-  }
-
-  private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    return res.send(await Statement.find().populate('operations'));
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
@@ -113,7 +128,7 @@ class StatementController extends Controller {
             }
           )
         );
-      } 
+      }
     } catch (error) {
 
     }
@@ -121,42 +136,6 @@ class StatementController extends Controller {
     return res.status(400);
 
   }
-
-  private async listByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { cpf } = req.params;
-
-    return res.send(ValidatorCPF.validator(cpf));
-
-    //    if (!Types.ObjectId.isValid(id)) {
-    //      return res.status(400).send('Id Inválido');
-    //    }
-
-    const statement = await Statement.find({ cpf: cpf });
-
-    if (statement.length > 0) {
-      return res.send(statement);
-    } else {
-      return res.status(400).send('Extrato não encontrado');
-    }
-  }
-
-  /*
-  private async findById(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { id } = req.params;
-
-    if (!Types.ObjectId.isValid(id)) {
-      return res.status(400).send('Id Inválido');
-    }
-
-    const statement = await Statement.findById(id);
-
-    if (!statement) {
-      return res.status(400).send('Produto não encontrado');
-    }
-
-    return res.send(statement);
-  }
-  */
 
 }
 
