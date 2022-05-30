@@ -31,9 +31,11 @@ class OperationController extends Controller {
       return res.status(400).send('Digite um CPF!');
     }
 
-    const operation = await Operation.find({ sender: `${cpf}` });
+    const sender = await Operation.find({ sender: `${cpf}` });
+    const receiver = await Operation.find({ receiver: `${cpf}` });
 
-    return res.status(200).send(operation);
+    return res.status(200).send(`${sender},
+    ${receiver}`);
   }
 
   private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
