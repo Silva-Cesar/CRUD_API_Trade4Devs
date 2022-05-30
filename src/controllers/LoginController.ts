@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import Register from '../schemas/Register';
 import Controller from './Controller';
 import jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 
 class LoginController extends Controller {
   constructor() {
@@ -20,20 +21,23 @@ class LoginController extends Controller {
     const expiresIn: number = Number(process.env.JWT_EXPIRES_IN) || 600
 
     const { cpf, password } = req.body;
-    const login = await Register.findOne({ cpf, password });
+    const login = await Register.findOne({ cpf });
 
-    if (!login) {
-      return res.status(401).send('CPF e/ou Senha incorreto(s).');
+    if (login) {
+
+      if (await bcrypt.compare(password, login.password)) {
+        const data = {
+          cpf: login.cpf
+        }
+
+        const token = jwt.sign({ data }, jwtToken, { expiresIn });
+        const response = { statusLogin: 'Sucesso', token: token }
+
+        return res.status(200).send(response);
+
+      }
     }
-
-    const data = { 
-      cpf: login.cpf
-    }
-
-    const token = jwt.sign({ data }, jwtToken, { expiresIn });
-    const response = {statusLogin: 'Sucesso',token: token}
-
-    return res.status(200).send(response);
+    return res.status(401).send('CPF e/ou Senha incorreto(s).');
   }
 }
 
