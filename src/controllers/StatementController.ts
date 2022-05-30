@@ -22,7 +22,7 @@ class StatementController extends Controller {
 
     if (cpf) {
 
-      if (days) {
+      if (days != null) {
 
         return res.send(await Statement.find(
           {
@@ -35,7 +35,7 @@ class StatementController extends Controller {
           ));
       }
 
-      if ((year) && (month)) {
+      if ((year != null) && (month != null)) {
 
         // resolver horario que nao esta em UTC
 
@@ -58,7 +58,7 @@ class StatementController extends Controller {
 
       }
 
-      if (month) {
+      if (month != null) {
 
         // resolver horario que nao esta em UTC
 
@@ -69,7 +69,7 @@ class StatementController extends Controller {
           return res.send(await Statement.find(
             {
               cpf: cpf,
-              year : `${year} - 1`,
+              year : new Date().getUTCFullYear() - 1,
               month : month
             })
             .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
@@ -86,7 +86,7 @@ class StatementController extends Controller {
             {
               cpf: cpf,
               month : month,
-              year : year
+              year : new Date().getUTCFullYear()
             })
             .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
             //.where(Operation  
