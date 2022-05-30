@@ -5,6 +5,7 @@ import { authMiddleware } from '../utils/middlewares/authMiddleware';
 import Controller from './Controller';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { ValidatorCPF } from '../utils/ValidatorCPF';
 
 
 class RegisterController extends Controller {
@@ -42,31 +43,37 @@ class RegisterController extends Controller {
   // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     try {
+      const { name, email, phone,birth_date, cpf, password } = req.body;
+      
+      const isValidCpf = ValidatorCPF.validator(cpf)
+      if(!isValidCpf){
+        return res.status(400).send({error: `O cpf ${cpf} é inválido!`});
+      }
 
       const bcryptSalt = 15;
 
       const register = await Register.create({
-        name: req.body.name,
-        email: req.body.email,
-        phone: req.body.phone,
-        birth_date: req.body.birth_date,
-        cpf: req.body.cpf,
-        password: await bcrypt.hash(req.body.password, bcryptSalt)
+        name: name,
+        email: email,
+        phone: phone,
+        birth_date: birth_date,
+        cpf: cpf,
+        password: await bcrypt.hash(password, bcryptSalt)
       });
 
       const balance = await Balance.create({ ...req.body, saldo: 0})
 
-      return res.send('Conta criada com sucesso!');
+      return res.send({message: 'Conta criada com sucesso!'});
     } catch (error) {
       if (error.errors === undefined) {
         const duplicateData = Object.keys(error.keyValue);
         return res
           .status(409)
-          .send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
+          .send({error: `Este ${String(duplicateData).toUpperCase()} já existe no sistema!`});
       }
 
       const requiredData = Object.keys(error.errors);
-      return res.status(400).send(`${String(requiredData).toUpperCase()} é requerido!`);
+      return res.status(400).send({error: `${String(requiredData).toUpperCase()} é requerido!`});
     }
   }
 
