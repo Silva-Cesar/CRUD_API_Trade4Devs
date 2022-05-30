@@ -45,7 +45,7 @@ class BalanceController extends Controller {
     const date = new Date();
     const responseData = {
       userName: balance[0].name,
-      balance: balance[0].saldo.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}),
+      balance: balance[0].balance.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}),
       date: date.toLocaleString()
     }
 
@@ -65,7 +65,7 @@ class BalanceController extends Controller {
   // Remover edit caso essa função seja executada pela operação
   private async edit(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const { cpf, value } = req.body;
-    const updateBalance = await Balance.findOneAndUpdate({ cpf: cpf }, { $inc: {saldo: value}});
+    const updateBalance = await Balance.findOneAndUpdate({ cpf: cpf }, { $inc: {balance: value}});
 
     const newBalance = await Balance.find({ cpf }); // Faz sentido buscar o usuário novamente no banco de dados? 
 

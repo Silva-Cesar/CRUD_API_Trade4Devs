@@ -3,7 +3,7 @@ import { model, Schema, Document } from 'mongoose';
 export interface BalanceInterface extends Document {
   name: string;
   cpf: string;
-  saldo: number;
+  balance: number;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;  
@@ -19,7 +19,7 @@ const BalanceSchema = new Schema({
     unique: true,
     required: [true, 'ID number is required']
   },
-  saldo: {
+  balance: {
     type: Number
   },
   deletedAt: {

@@ -5,6 +5,7 @@ import Register from '../schemas/Register';
 import Controller from './Controller';
 import { Types } from 'mongoose';
 import { Constants } from '../utils/Constants';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
 
 
 class OperationController extends Controller {
@@ -13,8 +14,8 @@ class OperationController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.list);
-    this.router.post(this.path, this.create);
+    this.router.get(this.path, authMiddleware, this.list); // Faz sentido este endpoit?
+    this.router.post(this.path, authMiddleware, this.create);
     this.router.delete(this.path, this.delete); //`${this.path}/:id`
   }
 
@@ -42,20 +43,20 @@ class OperationController extends Controller {
       return res.status(400).send('CPF de remetente e/ou destinatário não encontrado(s).');
     };
 
-    if (checkBalance[0].saldo < bodyReq.value) {
+    if (checkBalance[0].balance < bodyReq.value) {
       return res.status(400).send('Operação cancelada - Saldo insulficiente!');
     };
 
     const { id , sender , receiver, value } = await Operation.create(req.body); // Cria a operação de transferência.
 
     
-    if (!Types.ObjectId.isValid(id)) { // Verifica se o Id da operação criada é válido.
+    if (!Types.ObjectId.isValid(id)) { // Verifica se o Id da operação criada é válido. // Faz sentido validar o id que o próprio mongo gerou?
       return res.status(500).send('Id Inválido'); 
     }
     
     // Faz alteração no Balance, incrementa em receiver o valor transferido e decrementa em sender.
-    const senderUser = await Balance.findOneAndUpdate({ cpf: sender }, { $inc: {saldo: -value} });
-    const receiverUser = await Balance.findOneAndUpdate({ cpf: receiver }, { $inc: {saldo: value} });
+    const senderUser = await Balance.findOneAndUpdate({ cpf: sender }, { $inc: {balance: -value} });
+    const receiverUser = await Balance.findOneAndUpdate({ cpf: receiver }, { $inc: {balance: value} });
     
 
     // chamar api extrato

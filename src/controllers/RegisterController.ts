@@ -61,7 +61,7 @@ class RegisterController extends Controller {
         password: await bcrypt.hash(password, bcryptSalt)
       });
 
-      const balance = await Balance.create({ ...req.body, saldo: 0})
+      const balance = await Balance.create({ ...req.body, balance: 0})
 
       return res.send({message: 'Conta criada com sucesso!'});
     } catch (error) {
