@@ -3,6 +3,7 @@ import Register from '../schemas/Register';
 import Balance from '../schemas/Balance';
 import { authMiddleware } from '../utils/middlewares/authMiddleware';
 import Controller from './Controller';
+import * as bcrypt from 'bcrypt';
 
 class RegisterController extends Controller {
   constructor() {
@@ -37,7 +38,17 @@ class RegisterController extends Controller {
   // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     try {
-      const register = await Register.create(req.body);
+
+      const bcryptSalt = 15;
+
+      const register = await Register.create({
+        name: req.body.name,
+        email: req.body.email,
+        phone: req.body.phone,
+        birth_date: req.body.birth_date,
+        cpf: req.body.cpf,
+        password: await bcrypt.hash(req.body.password, bcryptSalt)
+      });
 
       const balance = await Balance.create({ ...req.body, saldo: 0})
 
