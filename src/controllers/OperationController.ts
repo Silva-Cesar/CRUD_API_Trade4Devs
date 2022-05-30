@@ -19,8 +19,11 @@ class OperationController extends Controller {
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const { cpf } = req.params;
 
-    return res.send('Base de operações.');
+    const operation = Operation.find({ cpf });
+
+    return res.send(operation);
   }
 
   private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
