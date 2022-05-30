@@ -13,11 +13,17 @@ class OperationController extends Controller {
 
   protected initRoutes(): void {
     this.router.get(this.path, this.list);
+    this.router.get(`${this.path}/all`, this.listAll);
     this.router.post(this.path, this.create);
     this.router.delete(this.path, this.delete); //`${this.path}/:id`
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
+
+    return res.send('Base de operações.');
+  }
+
+  private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const operation = await Operation.find();
 
     return res.send(operation);
