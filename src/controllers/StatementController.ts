@@ -3,6 +3,9 @@ import Statement from '../schemas/Statement';
 import Controller from './Controller';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
 import Operation from '../schemas/Operation';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
+import jwt from 'jsonwebtoken'
+
 
 class StatementController extends Controller {
   constructor() {
@@ -11,14 +14,16 @@ class StatementController extends Controller {
 
   protected initRoutes(): void {
 
-    this.router.post(`${this.path}/add`, this.create);
-    this.router.post(`${this.path}/list`, this.list);
+    this.router.post(`${this.path}/add`, authMiddleware, this.create);
+    this.router.post(`${this.path}/list`,authMiddleware, this.list);
 
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
-
-    const { cpf, month, year, days } = req.body;
+    const token = req.headers.authorization!
+    const { data }: any = jwt.decode(token)
+    const cpf = data.cpf
+    const { month, year, days } = req.body;
 
     if (cpf) {
 
@@ -93,9 +98,9 @@ class StatementController extends Controller {
         {
           cpf: cpf
         })
-        .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-        //.where(Operation
-        .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+        // .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+        // //.where(Operation
+        // .select(' -__v -_id -deletedAt -createdAt -updatedAt')
         // )
       );
 
@@ -110,7 +115,7 @@ class StatementController extends Controller {
 
     try {
 
-      if (ValidatorCPF.validator(req.body.cpf)) {
+      if (ValidatorCPF.validator(req.body.cpf)) { // Faz sentido validar novamente um cpf que validado no cadastro/register?
 
         return res.send(
           await Statement.updateOne(
