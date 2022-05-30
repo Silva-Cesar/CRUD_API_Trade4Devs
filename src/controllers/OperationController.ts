@@ -4,6 +4,7 @@ import Balance from '../schemas/Balance';
 import Register from '../schemas/Register';
 import Controller from './Controller';
 import { Types } from 'mongoose';
+import { Constants } from '../utils/Constants';
 
 
 class OperationController extends Controller {
@@ -62,7 +63,7 @@ class OperationController extends Controller {
     const axios = require('axios').default;
     const date = new Date();
 
-    axios.post('http://127.0.0.1:3000/statement', {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement`, {
       cpf : sender,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
@@ -80,7 +81,7 @@ class OperationController extends Controller {
         console.log(error);        
     });
 
-    axios.post('http://127.0.0.1:3000/statement', {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement`, {
       cpf : receiver,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
