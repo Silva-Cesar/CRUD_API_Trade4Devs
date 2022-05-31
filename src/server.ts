@@ -16,4 +16,4 @@ const app = new App([
 
 app.listen(Constants.SERVER_PORT, Constants.SERVER_HOST);
 
-app.get('Oi Express!');
+app.get('CRUD API - Trade4Devs está no ar!');

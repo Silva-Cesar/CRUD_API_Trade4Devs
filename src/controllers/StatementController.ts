@@ -4,7 +4,6 @@ import Controller from './Controller';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
 import Operation from '../schemas/Operation';
 import { authMiddleware } from '../utils/middlewares/authMiddleware';
-import jwt from 'jsonwebtoken'
 
 
 class StatementController extends Controller {
@@ -14,8 +13,8 @@ class StatementController extends Controller {
 
   protected initRoutes(): void {
 
-    this.router.post(`${this.path}/add`, authMiddleware, this.create);
-    this.router.post(`${this.path}/list`,authMiddleware, this.list);
+    this.router.post(`${this.path}/add`, this.create);
+    this.router.post(this.path, authMiddleware, this.list);
 
   }
 
@@ -52,10 +51,7 @@ class StatementController extends Controller {
             month : month
           })
           .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-          //.where(Operation
-          //  .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } }))
-            .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-        //)
+          .select(' -__v -_id -deletedAt -createdAt -updatedAt')
           );
 
 
@@ -110,7 +106,7 @@ class StatementController extends Controller {
         // )
       );
     }
-    return res.status(400);
+    return res.status(400).send('Digite um CPF');
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {

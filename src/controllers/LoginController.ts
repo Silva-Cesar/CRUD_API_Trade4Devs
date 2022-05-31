@@ -17,24 +17,25 @@ class LoginController extends Controller {
 
   // FUNÇÃO PRINCIPAL DA API LOGIN
   // Função para varrer a base de dados de Registro e buscar por um registro que contenha o
-  // CPF e o Password solicitado na requisição.
+  // CPF e o Password solicitado no corpo da requisição.
   private async getLogin(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const jwtToken: string = Constants.JWT_SECRET
     const expiresIn: number = Constants.JWT_EXPIRES_IN
 
-    const { cpf, password } = req.body; // Recebe CPF e Password da requisição.
-    const login = await Register.findOne({ cpf }); // Busca na base de Registro o CPF solicitado
+    const { cpf, password } = req.body;             // Recebe CPF e Password da requisição.
+    const login = await Register.findOne({ cpf });  // Busca na base de Registro o CPF solicitado
 
     // Verifica o resultado do login, tendo login verifica se a senha está correta com a senha do mesmo login.
     // Senha passa por uma encriptação antes de realizar o teste.
     if (login) {
 
+      // Faz a codificação da senha informada e compara com a salva na base de dados.
       if (await bcrypt.compare(password, login.password)) {
         const data = {
           cpf: login.cpf
         }
 
-        const token = jwt.sign({ data }, jwtToken, { expiresIn });
+        const token = jwt.sign({ data }, jwtToken, { expiresIn }); // Gera um token válido e limita o tempo de acesso.
         const response = { statusLogin: 'Sucesso', token: token }
 
         return res.status(200).send(response);

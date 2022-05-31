@@ -1,0 +1,42 @@
+[
+  {
+		"name": "Patrick Park",
+		"BirthDate": "97-03-04",
+		"cpf": "50000059021",
+		"email": "phasellus.libero.mauris@google.net",
+		"phone": 231309663,
+		"password": "91TBI4LO"
+	},
+	{
+		"name": "Marli Campos",
+		"BirthDate": "85-06-17",
+		"cpf": "48098437000",
+		"email": "urna.et@aol.edu",
+		"phone": 904148577,
+		"password": "61JAH3FZ"
+	},
+  {
+		"name": "Lucas Monteiro",
+		"BirthDate": "77-08-01",
+		"cpf": "02395941000",
+		"email": "mollis@google.edu",
+		"phone": 756731171,
+		"password": "52WGD5GS"
+	},
+	{
+		"name": "Fábio Rodrigues",
+		"BirthDate": "64-04-28",
+		"cpf": "80758773064",
+		"email": "lorem.lorem@yahoo.edu",
+		"phone": 905477161,
+		"password": "26ICH9QT"
+	},
+  {
+		"name": "Sabrina Moraes",
+		"BirthDate": "72-08-10",
+		"cpf": "04350237054",
+		"email": "curae@yahoo.com",
+		"phone": 650625165,
+		"password": "32FLQ2FD"
+	}
+]
