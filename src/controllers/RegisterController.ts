@@ -6,6 +6,7 @@ import Controller from './Controller';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
+import { ValidatorEmail } from '../utils/ValidatorEmail';
 
 
 class RegisterController extends Controller {
@@ -48,6 +49,11 @@ class RegisterController extends Controller {
       const isValidCpf = ValidatorCPF.validator(cpf)
       if(!isValidCpf){
         return res.status(400).send({error: `O cpf ${cpf} é inválido!`});
+      }
+
+      const isValidEmail = ValidatorEmail.validator(email)
+      if(!isValidEmail){
+        return res.status(400).send({error: `O e-mail ${email} é inválido!`});
       }
 
       const bcryptSalt = 15;
