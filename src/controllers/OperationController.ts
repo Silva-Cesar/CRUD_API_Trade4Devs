@@ -32,7 +32,7 @@ class OperationController extends Controller {
 
     const bodyReq = req.body;
 
-    if(bodyReq.value < 0){
+    if(bodyReq.value <= 0){
       return res.status(400).send({error: 'Valor Inválido, valor deve ser positivo!'})
     }
 
