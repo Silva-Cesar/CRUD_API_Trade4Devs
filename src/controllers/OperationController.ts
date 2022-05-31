@@ -18,19 +18,21 @@ class OperationController extends Controller {
     this.router.post(this.path, authMiddleware, this.create);
   }
 
+  // Função criada para testes em ambiente de desenvolvimento.
+  // Retorna todas as operações feitas.
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const operation = await Operation.find();
 
     return res.send(operation);
   }
 
-  // Função principal de Operation
-  // Função para realizar a operação de transferência.
+  // FUNÇÃO PRINCIPAL DA API OPERATION
+  // Função para realizar a operação de transferência entre dois CPFs.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
 
     const bodyReq = req.body;
 
-    if(bodyReq.value < 0){
+    if(bodyReq.value <= 0){
       return res.status(400).send({error: 'Valor Inválido, valor deve ser positivo!'})
     }
 
@@ -67,7 +69,7 @@ class OperationController extends Controller {
     const axios = require('axios').default;
     const date = new Date();
 
-    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement`, {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/add`, {
       cpf : sender,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),
@@ -80,7 +82,7 @@ class OperationController extends Controller {
         console.log(error);        
     });
 
-    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement`, {
+    axios.post(`${Constants.AXIOS_PROTOCOL}://${Constants.AXIOS_SERVER}:${Constants.AXIOS_PORT}/statement/add`, {
       cpf : receiver,
       year : date.getUTCFullYear(),
       month : date.getUTCMonth(),

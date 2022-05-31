@@ -115,7 +115,7 @@ class StatementController extends Controller {
 
     try {
 
-      if (ValidatorCPF.validator(req.body.cpf)) { // Faz sentido validar novamente um cpf que validado no cadastro/register?
+      if (ValidatorCPF.validator(req.body.cpf)) {
 
         return res.send(
           await Statement.updateOne(
