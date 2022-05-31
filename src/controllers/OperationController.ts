@@ -74,7 +74,7 @@ class OperationController extends Controller {
     const { id , sender , receiver, value } = await Operation.create(req.body); // Cria a operação de transferência.
 
     
-    if (!Types.ObjectId.isValid(id)) { // Verifica se o Id da operação criada é válido. // Faz sentido validar o id que o próprio mongo gerou?
+    if (!Types.ObjectId.isValid(id)) {
       return res.status(500).send({error: 'Id Inválido'}); 
     }
     
