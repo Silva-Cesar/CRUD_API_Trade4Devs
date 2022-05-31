@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken'
+import { Constants } from '../Constants'
 
 const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const jwtSecret = process.env.JWT_SECRET || 'my_super_secret';
+    const jwtSecret = Constants.JWT_SECRET;
     const token = req.headers.authorization;
 
     if(!token){

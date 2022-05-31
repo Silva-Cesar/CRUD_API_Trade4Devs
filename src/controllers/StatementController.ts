@@ -3,6 +3,9 @@ import Statement from '../schemas/Statement';
 import Controller from './Controller';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
 import Operation from '../schemas/Operation';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
+import jwt from 'jsonwebtoken'
+
 
 class StatementController extends Controller {
   constructor() {
@@ -11,8 +14,8 @@ class StatementController extends Controller {
 
   protected initRoutes(): void {
 
-    this.router.post(`${this.path}/add`, this.create);
-    this.router.post(`${this.path}/list`, this.list);
+    this.router.post(`${this.path}/add`, authMiddleware, this.create);
+    this.router.post(`${this.path}/list`,authMiddleware, this.list);
 
   }
 
@@ -22,7 +25,7 @@ class StatementController extends Controller {
 
     if (cpf) {
 
-      if (days) {
+      if (days != null) {
 
         return res.send(await Statement.find(
           {
@@ -35,57 +38,65 @@ class StatementController extends Controller {
           ));
       }
 
-      if ((year) && (month)) {
+      if ((year != null) && (month != null)) {
 
         // resolver horario que nao esta em UTC
 
-        console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+        //console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
 
 
         return res.send(await Statement.find(
           {
-            cpf: cpf
+            cpf: cpf,
+            year : year,
+            month : month
           })
           .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-          .where(Operation
-            .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+          //.where(Operation
+          //  .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } }))
             .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-          ));
+        //)
+          );
 
 
       }
 
-      if (month) {
+      if (month != null) {
 
         // resolver horario que nao esta em UTC
 
-        console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+        //console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
 
         if (month > new Date().getUTCMonth()) {
           // mes do ano anterior
           return res.send(await Statement.find(
             {
-              cpf: cpf
+              cpf: cpf,
+              year : new Date().getUTCFullYear() - 1,
+              month : month
             })
             .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-            .where(Operation
-              .find({ createdAt: { $gte: new Date(new Date().getUTCFullYear() - 1, month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear() - 1, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+            //.where(Operation
+              //.find({ createdAt: { $gte: new Date(new Date().getUTCFullYear() - 1, month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear() - 1, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
               .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-            ));
+              //)
+            );
 
         } else {
           // mes do ano corrente
 
           return res.send(await Statement.find(
             {
-              cpf: cpf
+              cpf: cpf,
+              month : month,
+              year : new Date().getUTCFullYear()
             })
             .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
-            .where(Operation
-              .find({ createdAt: { $gte: new Date(new Date().getUTCFullYear(), month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear(), month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+            //.where(Operation  
+            //.find({ createdAt: { $gte: new Date(new Date().getUTCFullYear(), month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear(), month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
               .select(' -__v -_id -deletedAt -createdAt -updatedAt')
-            ));
-
+              //)
+            );
         }
       }
 
@@ -98,20 +109,15 @@ class StatementController extends Controller {
         .select(' -__v -_id -deletedAt -createdAt -updatedAt')
         // )
       );
-
     }
-
     return res.status(400);
-
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     // verificar se os ids que vierem em " operations " sao do tipo Operation mesmo!!!
 
     try {
-
       if (ValidatorCPF.validator(req.body.cpf)) {
-
         return res.send(
           await Statement.updateOne(
             {
@@ -120,7 +126,7 @@ class StatementController extends Controller {
               cpf: req.body.cpf,
             },
             {
-              $addToSet: { operations: { $each: req.body.operations } },
+              $addToSet: { operations: { $each: req.body.operations }},
             },
             {
               upsert: true,
@@ -129,14 +135,8 @@ class StatementController extends Controller {
           )
         );
       }
-    } catch (error) {
-
-    }
-
+    } catch (error) { }
     return res.status(400);
-
   }
-
 }
-
 export default StatementController;
