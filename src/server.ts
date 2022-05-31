@@ -4,9 +4,7 @@ import BalanceController from './controllers/BalanceController';
 import RegisterController from './controllers/RegisterController';
 import StatementController from './controllers/StatementController';
 import LoginController from './controllers/LoginController';
-
-const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || '0.0.0.0';
+import { Constants } from './utils/Constants';
 
 const app = new App([
   new OperationController(),
@@ -16,6 +14,6 @@ const app = new App([
   new LoginController(),
 ]);
 
-app.listen(PORT, HOST);
+app.listen(Constants.SERVER_PORT, Constants.SERVER_HOST);
 
 app.get('Oi Express!');

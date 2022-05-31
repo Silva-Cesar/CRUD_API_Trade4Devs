@@ -1,7 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import Statement from '../schemas/Statement';
 import Controller from './Controller';
-import { Types } from 'mongoose';
+import { ValidatorCPF } from '../utils/ValidatorCPF';
+import Operation from '../schemas/Operation';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
+import jwt from 'jsonwebtoken'
+
 
 class StatementController extends Controller {
   constructor() {
@@ -9,96 +13,130 @@ class StatementController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.list); // recebe mes e cpf (e ano) - quem chama é o front
-    this.router.get(`${this.path}/all`, this.listAll); // recebe mes e cpf (e ano) - quem chama é o front
-    this.router.post(this.path, this.create); // recebe APENAS o id da operação
-    this.router.get(`${this.path}/:cpf`, this.findByCPF);
-    //this.router.get(`${this.path}/:id`, this.findById);
-    //this.router.put(`${this.path}/:id`, this.edit);
-    //this.router.delete(`${this.path}/:id`, this.delete);
+
+    this.router.post(`${this.path}/add`, authMiddleware, this.create);
+    this.router.post(`${this.path}/list`,authMiddleware, this.list);
+
   }
 
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const statements = await Statement.find();
 
-    if (statements.length > 0) {
-      return res.send(statements);
-    } else {
-      return res.status(400).send('Nenhum extrato encontrado');
+    const { cpf, month, year, days } = req.body;
+
+    if (cpf) {
+
+      if (days != null) {
+
+        return res.send(await Statement.find(
+          {
+            cpf: cpf
+          })
+          .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+          .where(Operation
+            .find({ createdAt: { $gte: new Date(Date.now() - days * 24 * 60 * 60 * 1000) } })
+            .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+          ));
+      }
+
+      if ((year != null) && (month != null)) {
+
+        // resolver horario que nao esta em UTC
+
+        //console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+
+
+        return res.send(await Statement.find(
+          {
+            cpf: cpf,
+            year : year,
+            month : month
+          })
+          .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+          //.where(Operation
+          //  .find({ createdAt: { $gte: new Date(year, month, 1, 0, 0, 0), $lte: new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } }))
+            .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+        //)
+          );
+
+
+      }
+
+      if (month != null) {
+
+        // resolver horario que nao esta em UTC
+
+        //console.log(new Date(year, month, 1, 0, 0, 0), "/", new Date(year, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0));
+
+        if (month > new Date().getUTCMonth()) {
+          // mes do ano anterior
+          return res.send(await Statement.find(
+            {
+              cpf: cpf,
+              year : new Date().getUTCFullYear() - 1,
+              month : month
+            })
+            .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+            //.where(Operation
+              //.find({ createdAt: { $gte: new Date(new Date().getUTCFullYear() - 1, month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear() - 1, month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+              .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+              //)
+            );
+
+        } else {
+          // mes do ano corrente
+
+          return res.send(await Statement.find(
+            {
+              cpf: cpf,
+              month : month,
+              year : new Date().getUTCFullYear()
+            })
+            .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+            //.where(Operation  
+            //.find({ createdAt: { $gte: new Date(new Date().getUTCFullYear(), month, 1, 0, 0, 0), $lte: new Date(new Date().getUTCFullYear(), month, new Date(year, month + 1, 0).getDate(), 0, 0, 0) } })
+              .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+              //)
+            );
+        }
+      }
+
+      return res.send(await Statement.find(
+        {
+          cpf: cpf
+        })
+        .populate('operations', ' -__v -_id -deletedAt -updatedAt ')
+        //.where(Operation
+        .select(' -__v -_id -deletedAt -createdAt -updatedAt')
+        // )
+      );
     }
-  }
-
-  private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    return res.send(await Statement.find().populate('operations'));
+    return res.status(400);
   }
 
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     // verificar se os ids que vierem em " operations " sao do tipo Operation mesmo!!!
 
-    return res.send(
-      await Statement.updateOne(
-        {
-          month: req.body.month,
-          year: req.body.year,
-          cpf: req.body.cpf,
-        },
-        {
-          $addToSet: { operations: { $each: req.body.operations } },
-        },
-        {
-          upsert: true,
-          runValidators: true,
-        }
-      )
-    );
-  }
-
-  private async findByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { cpf } = req.params;
-
-    //    if (!Types.ObjectId.isValid(id)) {
-    //      return res.status(400).send('Id Inválido');
-    //    }
-
-    const statement = await Statement.find({ cpf: cpf });
-
-    if (statement.length > 0) {
-      return res.send(statement);
-    } else {
-      return res.status(400).send('Extrato não encontrado');
-    }
-  }
-
-  private async findById(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { id } = req.params;
-
-    if (!Types.ObjectId.isValid(id)) {
-      return res.status(400).send('Id Inválido');
-    }
-
-    const statement = await Statement.findById(id);
-
-    if (!statement) {
-      return res.status(400).send('Produto não encontrado');
-    }
-
-    return res.send(statement);
-  }
-
-  private async edit(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { id } = req.params;
-    await Statement.findByIdAndUpdate(id, req.body);
-    const statement = await Statement.findById(id);
-    return res.send(statement);
-  }
-
-  private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { id } = req.params;
-    // const statement = await Statement.findById(id);
-    // statement.deleteOne();
-    await Statement.deleteOne({ id });
-    return res.status(204);
+    try {
+      if (ValidatorCPF.validator(req.body.cpf)) {
+        return res.send(
+          await Statement.updateOne(
+            {
+              month: req.body.month,
+              year: req.body.year,
+              cpf: req.body.cpf,
+            },
+            {
+              $addToSet: { operations: { $each: req.body.operations }},
+            },
+            {
+              upsert: true,
+              runValidators: true,
+            }
+          )
+        );
+      }
+    } catch (error) { }
+    return res.status(400);
   }
 }
-
 export default StatementController;

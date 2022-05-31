@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import Controller from './controllers/Controller';
+import { Constants } from './utils/Constants';
 
 class App {
   public app: express.Application;
@@ -23,7 +24,7 @@ class App {
 
   private connectDataBase(): void {
     mongoose.connect(
-      `mongodb+srv://${process.env.MONGO_DB_USER}:${process.env.MONGO_DB_PASS}@${process.env.MONGO_DB_CLUSTER}/crud-nodejs?retryWrites=true&w=majority`
+      `mongodb+srv://${Constants.MONGO_DB_USER}:${Constants.MONGO_DB_PASS}@${Constants.MONGO_DB_CLUSTER}/${Constants.MONGO_DB}?retryWrites=true&w=majority`
     );
   }
 
