@@ -21,6 +21,25 @@ class OperationController extends Controller {
   // Função criada para testes em ambiente de desenvolvimento.
   // Retorna todas as operações feitas.
   private async list(req: Request, res: Response, next: NextFunction): Promise<Response> {
+
+    return res.status(200).send('Base de dados de Operações.');
+  }
+
+  private async listByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const { cpf } = req.params;
+
+    if (!cpf) {
+      return res.status(400).send('Digite um CPF!');
+    }
+
+    const sender = await Operation.find({ sender: `${cpf}` });
+    const receiver = await Operation.find({ receiver: `${cpf}` });
+
+    return res.status(200).send(`${sender},
+    ${receiver}`);
+  }
+
+  private async listAll(req: Request, res: Response, next: NextFunction): Promise<Response> {
     const operation = await Operation.find();
 
     return res.send(operation);
@@ -55,7 +74,7 @@ class OperationController extends Controller {
     const { id , sender , receiver, value } = await Operation.create(req.body); // Cria a operação de transferência.
 
     
-    if (!Types.ObjectId.isValid(id)) { // Verifica se o Id da operação criada é válido. // Faz sentido validar o id que o próprio mongo gerou?
+    if (!Types.ObjectId.isValid(id)) {
       return res.status(500).send({error: 'Id Inválido'}); 
     }
     

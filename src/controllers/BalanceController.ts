@@ -47,8 +47,8 @@ class BalanceController extends Controller {
     const date = new Date();
     const responseData = {
       userName: balance[0].name,
-      balance: balance[0].balance.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'}),
-      date: date.toLocaleString()
+      balance: balance[0].balance,
+      date: date
     }
 
     return res.send(responseData)
