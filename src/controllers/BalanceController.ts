@@ -12,9 +12,8 @@ class BalanceController extends Controller {
 
   protected initRoutes(): void {
     this.router.get(`${this.path}/all`, authMiddleware, this.listAll);
-    // this.router.post(this.path, authMiddleware, this.create); // Faz sentido criar um outro saldo para o usuário?
     this.router.get(this.path, authMiddleware, this.findByCPF);
-    this.router.put(this.path, authMiddleware, this.edit); // Faz sentido um usuário alterar seu próprio saldo?
+    this.router.put(this.path, authMiddleware, this.edit);
     this.router.delete(`${this.path}/:id`, authMiddleware, this.delete);
   }
 
@@ -70,7 +69,7 @@ class BalanceController extends Controller {
     const { cpf, value } = req.body;
     const updateBalance = await Balance.findOneAndUpdate({ cpf: cpf }, { $inc: {balance: value}});
 
-    const newBalance = await Balance.find({ cpf }); // Faz sentido buscar o usuário novamente no banco de dados? 
+    const newBalance = await Balance.find({ cpf });
 
     return res.send(newBalance);
   }
