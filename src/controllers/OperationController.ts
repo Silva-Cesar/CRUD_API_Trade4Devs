@@ -14,9 +14,8 @@ class OperationController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.list);
-    this.router.post(this.path, this.create);
-    this.router.delete(`${this.path}/:id`, this.delete);
+    this.router.get(this.path, authMiddleware, this.list); // Faz sentido este endpoit?
+    this.router.post(this.path, authMiddleware, this.create);
   }
 
   // Função criada para testes em ambiente de desenvolvimento.
@@ -33,8 +32,12 @@ class OperationController extends Controller {
 
     const bodyReq = req.body;
 
+    if(bodyReq.value < 0){
+      return res.status(400).send({error: 'Valor Inválido, valor deve ser positivo!'})
+    }
+
     if (bodyReq.value != Number(bodyReq.value).toFixed(2)) {
-      return res.status(400).send('Valor com mais de duas casas decimais!')
+      return res.status(400).send({error: 'Valor com mais de duas casas decimais!'})
     };
 
     const findSender = await Register.find({ cpf: bodyReq.sender });
@@ -42,18 +45,18 @@ class OperationController extends Controller {
     const checkBalance = await Balance.find({ cpf: bodyReq.sender });
 
     if (!findSender.length || !findReceiver.length) {
-      return res.status(400).send('CPF de remetente e/ou destinatário não encontrado(s).');
+      return res.status(400).send({error: 'CPF de remetente e/ou destinatário não encontrado(s).'});
     };
 
     if (checkBalance[0].balance < bodyReq.value) {
-      return res.status(400).send('Operação cancelada - Saldo insulficiente!');
+      return res.status(400).send({error: 'Operação cancelada - Saldo insulficiente!'});
     };
 
     const { id , sender , receiver, value } = await Operation.create(req.body); // Cria a operação de transferência.
 
     
-    if (!Types.ObjectId.isValid(id)) { // Verifica se o Id da operação criada é válido.
-      return res.status(500).send('Id Inválido'); 
+    if (!Types.ObjectId.isValid(id)) { // Verifica se o Id da operação criada é válido. // Faz sentido validar o id que o próprio mongo gerou?
+      return res.status(500).send({error: 'Id Inválido'}); 
     }
     
     // Faz alteração no Balance, incrementa em receiver o valor transferido e decrementa em sender.
@@ -92,18 +95,10 @@ class OperationController extends Controller {
         console.log(error);        
     });
 
-    return res.status(200).send('Transferência realizada com sucesso!');
+    return res.status(200).send({message: 'Transferência realizada com sucesso!'});
 
   }
 
-  // Função criada para testes em ambiente de desenvolvimento.
-  // Função para deletar uma operação pelo seu Id.
-  private async delete(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { id } = req.params;
-    const operation = await Operation.findById(id);
-    operation?.deleteOne();
-    return res.send("Deleted");
-  }
 }
 
 export default OperationController;

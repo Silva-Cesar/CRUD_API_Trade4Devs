@@ -3,7 +3,10 @@ import Register from '../schemas/Register';
 import Balance from '../schemas/Balance';
 import Controller from './Controller';
 import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
+
 
 class RegisterController extends Controller {
   constructor() {
@@ -11,10 +14,10 @@ class RegisterController extends Controller {
   }
 
   protected initRoutes(): void {
-    this.router.get(this.path, this.getAll);
-    this.router.get(`${this.path}/cpf`, this.getByCPF);
+    this.router.get(this.path, authMiddleware, this.getAll); // Remover esta funcão
+    this.router.get(`${this.path}/me`, authMiddleware, this.getUserInfo);
     this.router.post(this.path, this.create);
-    this.router.delete(`${this.path}/:id`, this.delete);
+    this.router.delete(`${this.path}/:id`, authMiddleware, this.delete);
   }
 
   // Função criada para testes em ambiente de desenvolvimento.
@@ -25,23 +28,12 @@ class RegisterController extends Controller {
     // return res.send('Registro de todos os usuários'); - No projeto final usar esse return
   }
 
-  // Função criada para testes em ambiente de desenvolvimento.
-  // Retorna o registro onde consta o CPF requisitado.
-  private async getByCPF(req: Request, res: Response, next: NextFunction): Promise<Response> {
-    const { cpf } = req.body
-
-    try {
-
-      if (!cpf) {
-        return res.status(400).send('Digite um cpf.'); // Caso não tenha requisição no body, envia mensagem de erro.
-      }
-  
-      const register = await Register.find({cpf});
-      return res.status(200).send(register);
-
-    } catch (error) {
-      return res.status(400).send(error);
-    }
+  private async getUserInfo(req: Request, res: Response, next: NextFunction): Promise<Response> {
+    const token = req.headers.authorization!
+    const { data }: any = jwt.decode(token)
+    const cpf = data.cpf
+    const register = await Register.find({cpf}).select({password: 0, __v: 0 });
+    return res.send(register);
   }
 
   // FUNÇÃO PRINCIPAL DA API DE REGISTRO
@@ -52,27 +44,27 @@ class RegisterController extends Controller {
   // constar no sistema, ele retorna uma mensagem avisando que tal dado já existe.
   private async create(req: Request, res: Response, next: NextFunction): Promise<Response> {
     try {
+      const { name, email, phone,birth_date, cpf, password } = req.body;
+      
+      const isValidCpf = ValidatorCPF.validator(cpf)
+      if(!isValidCpf){
+        return res.status(400).send({error: `O cpf ${cpf} é inválido!`});
+      }
 
       const bcryptSalt = 15; // Quantidade de salting.
 
-      // Confere se o CPF é válido de acordo com as regras da Receita Federal.
-      if (!ValidatorCPF.validator(req.body.cpf)) {
-        return res.status(400).send('CPF inválido!')
-      };
-
-      const register = await Register.create({ // Função para criar o registro.
-        name: req.body.name,
-        email: req.body.email,
-        phone: req.body.phone,
-        birth_date: req.body.birth_date,
-        cpf: req.body.cpf,
-        password: await bcrypt.hash(req.body.password, bcryptSalt) // Função para hashing do password.
+      const register = await Register.create({
+        name: name,
+        email: email,
+        phone: phone,
+        birth_date: birth_date,
+        cpf: cpf,
+        password: await bcrypt.hash(password, bcryptSalt)
       });
 
-      // Cria um documento com o nome e CPF registrado e saldo de 1000 na API Balance.
-      const balance = await Balance.create({ ...req.body, balance: 1000}); 
+      const balance = await Balance.create({ ...req.body, balance: 0})
 
-      return res.send('Conta criada com sucesso!');
+      return res.send({message: 'Conta criada com sucesso!'});
     } catch (error) {
 
       // Caso o erro seja de duplicidade, volta este erro.
@@ -80,12 +72,12 @@ class RegisterController extends Controller {
         const duplicateData = Object.keys(error.keyValue);
         return res
           .status(409)
-          .send(`Este ${String(duplicateData).toUpperCase()} já existe no sistema!`);
+          .send({error: `Este ${String(duplicateData).toUpperCase()} já existe no sistema!`});
       }
 
       // Caso o erro seja de falta de informação, volta este erro.
       const requiredData = Object.keys(error.errors);
-      return res.status(400).send(`${String(requiredData).toUpperCase()} é requerido!`);
+      return res.status(400).send({error: `${String(requiredData).toUpperCase()} é requerido!`});
     }
   }
 
