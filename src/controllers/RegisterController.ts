@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
 import { authMiddleware } from '../utils/middlewares/authMiddleware';
+import { ValidatorEmail } from '../utils/ValidatorEmail';
 
 
 class RegisterController extends Controller {
@@ -51,7 +52,12 @@ class RegisterController extends Controller {
         return res.status(400).send({error: `O cpf ${cpf} é inválido!`});
       }
 
-      const bcryptSalt = 15; // Quantidade de salting.
+      const isValidEmail = ValidatorEmail.validator(email)
+      if(!isValidEmail){
+        return res.status(400).send({error: `O e-mail ${email} é inválido!`});
+      }
+
+      const bcryptSalt = 15;
 
       const register = await Register.create({
         name: name,
