@@ -46,8 +46,8 @@ A aplicação utiliza um banco de dados MongoDB, desta forma, é necessário for
 Você precisará do [Node.js](https://nodejs.org) instalado na seu computador e seguir os passos abaixo para construir a aplicação.
 
 ```bash
-$ git clone https://github.com/andresaganski/.git
-$ cd CRUD-Nodejs
+$ git clone https://github.com/Silva-Cesar/CRUD_API_Trade4Devs.git
+$ cd CRUD_API_Trade4Devs
 $ npm install
 $ npm run dev
 ```
