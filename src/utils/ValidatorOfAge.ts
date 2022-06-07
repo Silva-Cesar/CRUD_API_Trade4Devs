@@ -1,13 +1,14 @@
 export class ValidatorOfAge {
   public static validator(birth_date: string): boolean {
-    var today = new Date();
-    var thisYear = today.getFullYear();
-    var birth_dateSplit = birth_date.split('-');
-    var bYear = Number(birth_dateSplit[0]);
-    var bMonth = Number(birth_dateSplit[1]);
-    var bDay = Number(birth_dateSplit[2]);
-    var age = thisYear - bYear;
-    var thisMonth = today.getMonth() + 1;
+    const today = new Date();
+    const thisYear = today.getFullYear();
+    const birth_dateSplit = birth_date.split('/');
+    const bDay = Number(birth_dateSplit[0]);
+    const bMonth = Number(birth_dateSplit[1]);
+    const bYear = Number(birth_dateSplit[2]);
+    let age = thisYear - bYear;
+    const thisMonth = today.getMonth() + 1;
+
     //Se mês atual for menor que o nascimento, não fez aniversário ainda;
     if (thisMonth < bMonth) {
       age--;
