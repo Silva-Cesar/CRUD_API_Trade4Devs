@@ -1,13 +1,14 @@
-import { NextFunction, Request, Response } from 'express';
-import Register from '../schemas/Register';
-import Balance from '../schemas/Balance';
-import Controller from './Controller';
 import * as bcrypt from 'bcrypt';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import Balance from '../schemas/Balance';
+import Register from '../schemas/Register';
+import { authMiddleware } from '../utils/middlewares/authMiddleware';
 import { ValidatorCPF } from '../utils/ValidatorCPF';
+import { ValidatorDate } from '../utils/ValidatorDate';
 import { ValidatorEmail } from '../utils/ValidatorEmail';
 import { ValidatorOfAge } from '../utils/ValidatorOfAge';
-import { authMiddleware } from '../utils/middlewares/authMiddleware';
+import Controller from './Controller';
 
 class RegisterController extends Controller {
   constructor() {
@@ -46,18 +47,19 @@ class RegisterController extends Controller {
     try {
       const { name, email, phone, birth_date, cpf, password } = req.body;
 
-      const isValidCpf = ValidatorCPF.validator(cpf);
-      if (!isValidCpf) {
+      if (!ValidatorCPF.validator(cpf)) {
         return res.status(400).send({ error: `O cpf ${cpf} é inválido!` });
       }
 
-      const isValidEmail = ValidatorEmail.validator(email);
-      if (!isValidEmail) {
+      if (!ValidatorEmail.validator(email)) {
         return res.status(400).send({ error: `O e-mail ${email} é inválido!` });
       }
 
-      const isOfAge = ValidatorOfAge.validator(birth_date);
-      if (!isOfAge) {
+      if (!ValidatorDate.validator(birth_date)) {
+        return res.status(400).send({ error: `A data deve estar no formato dd/mm/aaaa` });
+      }
+
+      if (!ValidatorOfAge.validator(birth_date)) {
         return res
           .status(400)
           .send({ error: `Desculpe, você precisa ter mais de 18 anos para se cadastrar.` });
@@ -65,7 +67,7 @@ class RegisterController extends Controller {
 
       const bcryptSalt = 15;
 
-      const register = await Register.create({
+      await Register.create({
         name: name,
         email: email,
         phone: phone,
@@ -74,7 +76,7 @@ class RegisterController extends Controller {
         password: await bcrypt.hash(password, bcryptSalt),
       });
 
-      const balance = await Balance.create({ ...req.body, balance: 0 });
+      await Balance.create({ ...req.body, balance: 0 });
 
       return res.send({ message: 'Conta criada com sucesso!' });
     } catch (error) {
